@@ -1,3 +1,16 @@
+## Installation
+On Windows:
+
+```
+pip install -r requirements_windows.txt
+```
+
+On MacOS
+
+```
+pip install -r requirements_macos.txt
+```
+
 ## Useful links:
 - [Ursina](https://www.ursinaengine.org/)
 - [Robotics Toolbox Python](https://petercorke.github.io/robotics-toolbox-python)
