@@ -18,10 +18,10 @@ app = Ursina(size=(600, 600))
 class Player(Entity):
     entities = []
 
-    def __init__(self, name="Player", can_move=False, add_to_scene_entities=True, **kwargs):
+    def __init__(self, name="Player", is_human=False, add_to_scene_entities=True, **kwargs):
         super().__init__(add_to_scene_entities=add_to_scene_entities, **kwargs)
         self.name = name
-        self.can_move = can_move
+        self.is_human = is_human
         self.base_color = self.color
         self.collider = BoxCollider(
             self, center=Vec3(0, 0, 0), size=Vec3(2, 2, 2))
@@ -43,7 +43,7 @@ class Player(Entity):
         toggle = False
         none_received = True
         while True:
-            if self.can_move and self.world is not None and not self.path:
+            if self.is_human and self.world is not None and not self.path:
                 if none_received:
                     # none_received = False
                     if not toggle:
@@ -73,7 +73,7 @@ class Player(Entity):
             self.room = self.initialPosition
 
     def update(self):
-        if self.can_move:
+        if self.is_human:
             self.lock.acquire()
             if self.path:
                 p = self.path.pop(0)
@@ -128,13 +128,13 @@ bob = Player(model='models/Man.obj', collider='box',
 alice = Player(model='models/Woman.obj', collider='box',
                scale=0.0065, position=Vec3(50, 5, 0))
 '''
-bob = Player(model='cube', collider='sphere', name="Bob", can_move=True,
+bob = Player(model='cube', collider='sphere', name="Bob", is_human=True,
              color=color.azure, position=Vec3(23, 10, 0), scale=3)
-alice = Player(model='cube', collider='sphere', name="Alice", can_move=True,
+alice = Player(model='cube', collider='sphere', name="Alice", is_human=True,
                color=color.pink, position=Vec3(6, 10, 0), scale=3)
-robot = Player(model='cube', collider='sphere', name="Robot", can_move=False,
+robot = Player(model='cube', collider='sphere', name="Robot", is_human=False,
                color=color.orange, position=Vec3(-8.66907, -10.6577, 0))
-nurse = Player(model='cube', collider='sphere', name="Nurse", can_move=True,
+nurse = Player(model='cube', collider='sphere', name="Nurse", is_human=True,
                color=color.white, position=Vec3(-23, -10, 0), scale=3)
 
 
