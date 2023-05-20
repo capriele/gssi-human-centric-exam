@@ -69,15 +69,15 @@ class Player(Entity):
             self.lock.acquire()
             if self.path:
                 p = self.path.pop(0)
-                origin = self.world_position
-                ignore = [self.model]
-                ignore.extend(self.world.players)
-                hit_info = raycast(origin, Vec3(p.x, p.y, 0),
-                                   ignore=ignore, distance=1, debug=False)
-                if not hit_info.hit:
-                    self.position = Vec3(p.x, p.y, 0)
-                else:
-                    self.path = []
+                # origin = self.world_position
+                # ignore = [self.model]
+                # ignore.extend(self.world.players)
+                # hit_info = raycast(origin, Vec3(p.x, p.y, 0),
+                #                   ignore=ignore, distance=1, debug=False)
+                # if not hit_info.hit:
+                self.position = Vec3(p.x, p.y, 0)
+                # else:
+                #    self.path = []
             else:
                 self.goal = None
             self.lock.release()
