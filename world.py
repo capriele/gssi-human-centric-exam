@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from roboticstoolbox import *
 import numpy as np
 from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 import scipy
 
 
@@ -25,6 +26,31 @@ class World:
             if player.name.lower() == name.lower():
                 return player
         return None
+
+    def isPlayerInRoom(self, name):
+        player = self.findPlayer(name)
+        if player is not None:
+            if player.name.lower() == "bob":
+                return self.bobRoomPolygon().contains(point)
+            elif player.name.lower() == "alice":
+                return self.aliceRoomPolygon().contains(point)
+        return False
+
+    def bobRoomPolygon(self):
+        return Polygon([
+            self.map2point(Point(93, 593)),
+            self.map2point(Point(93, 453)),
+            self.map2point(Point(293, 453)),
+            self.map2point(Point(293, 593)),
+        ])
+
+    def aliceRoomPolygon(self):
+        return Polygon([
+            self.map2point(Point(93, 444)),
+            self.map2point(Point(93, 303)),
+            self.map2point(Point(293, 303)),
+            self.map2point(Point(293, 444)),
+        ])
 
     def point2map(self, point):
         x = ((point.x + abs(self.x_min))/self.step)-1
@@ -95,7 +121,6 @@ class World:
         self.x_max = 30.0
         self.y_min = -15.0
         self.y_max = 15.0
-        self.polygons = []
         self.use_distance_transform = use_distance_transform
 
         if create_map:
@@ -105,7 +130,6 @@ class World:
             self.map = self.map.astype(np.int32)
             for wall in walls:
                 poly = wall.polygon()
-                self.polygons.append(poly)
                 points = list(poly.exterior.coords)
                 p = self.point2map2(Point(points[0][0], points[0][1]))
                 x_min = p.x
@@ -132,7 +156,9 @@ class World:
         else:
             house = scipy.io.loadmat("./data/map.mat")
             self.map = house["map"]
-        self.planner = self.createPlanner()
+
+        self.user_map = self.map.copy()
+        self.user_map[550:600, 20:70] = 0
 
     def createPlanner(self):
         if self.use_distance_transform:
@@ -142,3 +168,13 @@ class World:
             return p
         else:
             return Bug2(occgrid=self.map.copy())
+
+    def createUserPlanner(self):
+        if self.use_distance_transform:
+            p = DistanceTransformPlanner(self.user_map.copy(), start=[
+                                         10, 10], goal=[11, 11])
+            p.plan()
+            return p
+        else:
+            return Bug2(occgrid=self.user_map.copy())
+        # planner.plot(block=True)
