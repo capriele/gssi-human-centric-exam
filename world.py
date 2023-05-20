@@ -60,8 +60,8 @@ class World:
             self.map2point(Point(289, 590)),
             self.map2point(Point(71, 590)),
             self.map2point(Point(19, 590)),
-            self.map2point(Point(3, 590)),
-            self.map2point(Point(3, 6)),
+            self.map2point(Point(19, 590)),
+            self.map2point(Point(19, 6)),
             self.map2point(Point(289, 6)),
             self.map2point(Point(289, 140)),
             self.map2point(Point(95, 140)),
@@ -84,17 +84,21 @@ class World:
             self.map2point(Point(95, 140)),
             self.map2point(Point(289, 140)),
             self.map2point(Point(289, 6)),
-            self.map2point(Point(3, 6)),
-            self.map2point(Point(3, 590)),
+            self.map2point(Point(19, 6)),
+            self.map2point(Point(19, 590)),
             self.map2point(Point(19, 590)),
             self.map2point(Point(71, 590)),
             self.map2point(Point(80, 544)),
             self.map2point(Point(80, 410)),
         ])
 
-    def randomPointsInPolygon(self, polygon, start=Point(0, 0), distance=10):
+    def randomPointsInPolygon(self, polygon, start=Point(0, 0), distance=20):
         points = []
-        minx, miny, maxx, maxy = polygon.bounds
+        # minx, miny, maxx, maxy = polygon.bounds
+        minx = start.x - distance * 0.5
+        miny = start.y - distance * 0.5
+        maxx = start.x + distance * 0.5
+        maxy = start.y + distance * 0.5
         dist = np.inf
         while dist > distance or len(points) == 0:
             pnt = Point(np.random.uniform(minx, maxx),
@@ -223,12 +227,20 @@ class World:
         else:
             return Bug2(occgrid=self.map.copy())
 
-    def createUserPlanner(self):
+    def createUserPlanner(self, player=None):
+        tmp_map = self.user_map.copy()
+        if player is not None:
+            if player.name.lower() == "bob":
+                tmp_map[360:412, 83:94] = 1
+                tmp_map[182:233, 83:94] = 1
+            elif player.name.lower() == "alice":
+                tmp_map[539:595, 83:94] = 1
+                tmp_map[182:233, 83:94] = 1
         if self.use_distance_transform:
-            p = DistanceTransformPlanner(self.user_map.copy(), start=[
-                                         10, 10], goal=[11, 11])
-            p.plan()
-            return p
+            planner = DistanceTransformPlanner(
+                tmp_map, start=[10, 10], goal=[11, 11])
+            planner.plan()
         else:
-            return Bug2(occgrid=self.user_map.copy())
+            planner = Bug2(occgrid=tmp_map)
         # planner.plot(block=True)
+        return planner

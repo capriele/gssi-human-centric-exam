@@ -37,7 +37,6 @@ class Player(Entity):
         Player.entities.append(self)
         # TODO: uncomment to make the player moving
         self.thread.start()
-
         # self.collider.visible = True
 
     def update_thread(self):
@@ -55,7 +54,7 @@ class Player(Entity):
 
     def setWorld(self, world):
         self.world = world
-        self.planner = self.world.createPlanner()
+        self.planner = self.world.createUserPlanner(self)
         if self.name == "Alice":
             self.room = self.world.aliceRoomDoorCoords()
             self.area = self.world.aliceMovementPolygon()
@@ -77,6 +76,8 @@ class Player(Entity):
                                    ignore=ignore, distance=1, debug=False)
                 if not hit_info.hit:
                     self.position = Vec3(p.x, p.y, 0)
+                else:
+                    self.path = []
             else:
                 self.goal = None
             self.lock.release()
