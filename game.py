@@ -31,35 +31,26 @@ class Player(Entity):
         self.world = None
         self.planner = None
         self.initialPosition = self.position
+        self.area = None
         self.lock = threading.Lock()
         self.thread = threading.Thread(target=self.update_thread, args=())
         Player.entities.append(self)
         # TODO: uncomment to make the player moving
-        # self.thread.start()
+        self.thread.start()
 
         # self.collider.visible = True
 
     def update_thread(self):
-        toggle = False
-        none_received = True
         while True:
-            if self.is_human and self.world is not None and not self.path:
-                if none_received:
-                    # none_received = False
-                    if not toggle:
-                        self.goal = self.world.findPlayer(self.name).room
-                    else:
-                        self.goal = self.initialPosition
-                    toggle = not toggle
+            if self.is_human and self.world is not None and self.area is not None and not self.path:
+                self.goal = self.world.randomPointsInPolygon(
+                    self.area, Point(self.position.x, self.position.y))
                 if self.goal is not None:
                     tmp_path = World.findPath(
                         self.world, self.planner, self.position, self.goal)
-                    if tmp_path is None:
-                        none_received = True
-                    else:
-                        self.lock.acquire()
-                        self.path.extend(tmp_path)
-                        self.lock.release()
+                    self.lock.acquire()
+                    self.path.extend(tmp_path)
+                    self.lock.release()
             time.sleep(1.5)
 
     def setWorld(self, world):
@@ -67,8 +58,10 @@ class Player(Entity):
         self.planner = self.world.createPlanner()
         if self.name == "Alice":
             self.room = self.world.aliceRoomDoorCoords()
+            self.area = self.world.aliceMovementPolygon()
         elif self.name == "Bob":
             self.room = self.world.bobRoomDoorCoords()
+            self.area = self.world.bobMovementPolygon()
         else:
             self.room = self.initialPosition
 
@@ -78,8 +71,10 @@ class Player(Entity):
             if self.path:
                 p = self.path.pop(0)
                 origin = self.world_position
+                ignore = [self.model]
+                ignore.extend(self.world.players)
                 hit_info = raycast(origin, Vec3(p.x, p.y, 0),
-                                   ignore=(self,), distance=1, debug=False)
+                                   ignore=ignore, distance=1, debug=False)
                 if not hit_info.hit:
                     self.position = Vec3(p.x, p.y, 0)
             else:

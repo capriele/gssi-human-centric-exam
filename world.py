@@ -52,6 +52,60 @@ class World:
             self.map2point(Point(293, 444)),
         ])
 
+    def bobMovementPolygon(self):
+        return Polygon([
+            self.map2point(Point(95, 544)),
+            self.map2point(Point(95, 457)),
+            self.map2point(Point(289, 457)),
+            self.map2point(Point(289, 590)),
+            self.map2point(Point(71, 590)),
+            self.map2point(Point(19, 590)),
+            self.map2point(Point(3, 590)),
+            self.map2point(Point(3, 6)),
+            self.map2point(Point(289, 6)),
+            self.map2point(Point(289, 140)),
+            self.map2point(Point(95, 140)),
+            self.map2point(Point(95, 50)),
+            self.map2point(Point(80, 50)),
+            self.map2point(Point(80, 544)),
+        ])
+
+    def aliceMovementPolygon(self):
+        return Polygon([
+            self.map2point(Point(95, 410)),
+            self.map2point(Point(95, 440)),
+            self.map2point(Point(289, 440)),
+            self.map2point(Point(289, 307)),
+            self.map2point(Point(95, 309)),
+            self.map2point(Point(95, 360)),
+            self.map2point(Point(80, 360)),
+            self.map2point(Point(80, 50)),
+            self.map2point(Point(95, 50)),
+            self.map2point(Point(95, 140)),
+            self.map2point(Point(289, 140)),
+            self.map2point(Point(289, 6)),
+            self.map2point(Point(3, 6)),
+            self.map2point(Point(3, 590)),
+            self.map2point(Point(19, 590)),
+            self.map2point(Point(71, 590)),
+            self.map2point(Point(80, 544)),
+            self.map2point(Point(80, 410)),
+        ])
+
+    def randomPointsInPolygon(self, polygon, start=Point(0, 0), distance=10):
+        points = []
+        minx, miny, maxx, maxy = polygon.bounds
+        dist = np.inf
+        while dist > distance or len(points) == 0:
+            pnt = Point(np.random.uniform(minx, maxx),
+                        np.random.uniform(miny, maxy))
+            a = np.array((start.x, start.y, 0))
+            b = np.array((pnt.x, pnt.y, 0))
+            dist = np.linalg.norm(a-b)
+            if dist <= distance and polygon.contains(pnt):
+                points.append(pnt)
+        return points[0]
+
     def point2map(self, point):
         x = ((point.x + abs(self.x_min))/self.step)-1
         y = ((point.y + abs(self.y_min))/self.step)-1
