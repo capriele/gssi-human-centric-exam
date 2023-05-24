@@ -7,19 +7,20 @@ from shapely.geometry.polygon import Polygon
 import scipy
 
 
+class Room:
+    def __init__(self, name, door, polygon):
+        self.name = name
+        self.door = door
+        self.polygon = polygon
+
+    def __str__(self):
+        return self.name
+
+
 class World:
 
     def robotBaseCoords(self):
         return Vec3(-8.66907, -10.6577, 0)
-
-    def medicalRoomCoords(self):
-        return Vec3(-8.66907, 10.0107, 0)
-
-    def aliceRoomDoorCoords(self):
-        return Vec3(9.51363, -7.97634, 0)
-
-    def bobRoomDoorCoords(self):
-        return Vec3(27.6749, -8.15384, 0)
 
     def findPlayer(self, name):
         for player in self.players:
@@ -35,22 +36,6 @@ class World:
             elif player.name.lower() == "alice":
                 return self.aliceRoomPolygon().contains(point)
         return False
-
-    def bobRoomPolygon(self):
-        return Polygon([
-            self.map2point(Point(93, 593)),
-            self.map2point(Point(93, 453)),
-            self.map2point(Point(293, 453)),
-            self.map2point(Point(293, 593)),
-        ])
-
-    def aliceRoomPolygon(self):
-        return Polygon([
-            self.map2point(Point(93, 444)),
-            self.map2point(Point(93, 303)),
-            self.map2point(Point(293, 303)),
-            self.map2point(Point(293, 444)),
-        ])
 
     def bobMovementPolygon(self):
         return Polygon([
@@ -171,6 +156,20 @@ class World:
             pass
         return path
 
+    def patientsCount(self):
+        count = 0
+        for p in self.players:
+            if p.is_human and not p.is_staff:
+                count += 1
+        return count
+
+    def patientsList(self):
+        patients = []
+        for p in self.players:
+            if p.is_human and not p.is_staff:
+                patients.append(p)
+        return patients
+
     def __init__(self, players, walls, step=0.1, create_map=False, use_distance_transform=False):
         self.players = players
         self.walls = walls
@@ -180,6 +179,35 @@ class World:
         self.y_min = -15.0
         self.y_max = 15.0
         self.use_distance_transform = use_distance_transform
+
+        # create all the rooms
+        self.rooms = [
+            Room(
+                "Medical Room",
+                Vec3(-8.66907, 10.0107, 0),
+                []
+            ),
+            Room(
+                "Alice Room",
+                Vec3(9.51363, -7.97634, 0),
+                Polygon([
+                    self.map2point(Point(93, 444)),
+                    self.map2point(Point(93, 303)),
+                    self.map2point(Point(293, 303)),
+                    self.map2point(Point(293, 444)),
+                ]),
+            ),
+            Room(
+                "Bob Room",
+                Vec3(27.6749, -8.15384, 0),
+                Polygon([
+                    self.map2point(Point(93, 593)),
+                    self.map2point(Point(93, 453)),
+                    self.map2point(Point(293, 453)),
+                    self.map2point(Point(293, 593)),
+                ]),
+            ),
+        ]
 
         if create_map:
             x_range = np.arange(self.x_min, self.x_max, self.step)

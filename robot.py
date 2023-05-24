@@ -8,15 +8,196 @@ class Activity(Enum):
     NONE = 0
     MOVING = 1
     GO_TO_MEDICAL_ROOM = 2
-    GO_TO_BOB = 3
-    GO_TO_ALICE = 4
-    WAIT_ALICE_ANSWER = 5
-    ALICE_GIVE_PILL = 6
-    CALL_NURSE_ALICE = 7
-    WAIT_BOB_ANSWER = 8
-    BOB_GIVE_PILL = 9
-    CALL_NURSE_BOB = 10
-    PILL_GIVEN = 11
+    GO_TO_PATIENT = 3
+    WAIT_ANSWER = 5
+    PATIENT_GIVE_PILL = 6
+    CALL_NURSE_FOR_PATIENT = 7
+    TAKE_PILLS = 8
+    PILL_GIVEN = 9
+
+
+class PlanStep:
+
+    @staticmethod
+    def none():
+        return PlanStep(None)
+
+    def __init__(self, target=Point(0, 0), activity=Activity.NONE, status=None, onComplete=None, patient=None):
+        self.target = target
+        self.activity = activity
+        self.status = status
+        self.onComplete = onComplete
+        self._isTargetReached = False
+        self._answer = None
+        self._patient = patient
+
+    def targetReached(self):
+        self._isTargetReached = True
+
+    def isTargetReached(self):
+        return self._isTargetReached
+
+    def setAnswer(self, value):
+        self._answer = value
+
+    def getAnswer(self):
+        return self._answer
+
+    def hasBeenAnswered(self):
+        return self._answer != None
+
+    def getPatient(self):
+        return self._patient
+
+    def __str__(self):
+        return
+
+
+class PlanVerificator:
+    def __str__(self):
+        return
+
+
+class PlanConditioner:
+    def __str__(self):
+        return
+
+
+class Planner:
+    def __init__(self, robot):
+        self.robot = robot
+        self.planner = self.robot.world.createPlanner()
+        self.medical_room = next(
+            x for x in self.robot.world.rooms if "medical" in x.name.lower())
+        self.currentStep = None
+        self.currentPath = []
+        self.steps = []
+
+    def reset(self):
+        # Standard steps
+        self.steps = [
+            PlanStep.none(),
+            PlanStep(self.medical_room.door, Activity.MOVING,
+                     "Going to the Medical Room for taking the pills"),
+            PlanStep(None, Activity.TAKE_PILLS, None, lambda: (
+                self.robot.setPills(self.robot.world.patientsCount()),
+            )),
+            PlanStep(self.robot.base, Activity.MOVING, str(
+                self.robot.world.patientsCount()) + " pills taken"),
+            PlanStep.none(),
+        ]
+
+        # Patient based steps
+        for p in self.robot.world.patientsList():
+            status1 = "Going to " + p.name + " Room"
+            status2 = p.name + ", can I enter?"
+            self.steps.extend([
+                PlanStep(p.room.door, Activity.MOVING, status1, patient=p),
+                PlanStep(None, Activity.WAIT_ANSWER, status2, patient=p),
+                PlanStep(p.room.door, Activity.MOVING, patient=p),
+            ])
+
+        # Standard steps
+        self.steps.extend([
+            PlanStep(self.robot.base, Activity.MOVING, "Going to the Base"),
+            PlanStep(None, Activity.NONE,
+                     "All the tasks completed for today. See you tomorrow!"),
+        ])
+
+    def isWaitingAnswer(self):
+        return self.currentStep is not None and self.currentStep.activity == Activity.WAIT_ANSWER
+
+    def setAnswer(self, answer):
+        if self.currentStep is not None and self.currentStep.activity == Activity.WAIT_ANSWER:
+            self.currentStep.setAnswer(answer)
+
+    def currentActivity(self):
+        if self.currentStep is not None:
+            return self.currentStep.activity
+        return Activity.NONE
+
+    def process(self):
+        if self.steps:
+            if self.currentStep is None:
+                self.currentStep = self.steps.pop(0)
+
+                if self.currentStep.status is not None:
+                    self.robot.setStatus(self.currentStep.status)
+                else:
+                    self.robot.setStatus("")
+
+                # Compute the path from robot actual position to the target
+                if self.currentStep.target is not None:
+                    self.currentPath = self.compute_path(
+                        self.currentStep.target)
+
+            else:
+                if self.currentStep.activity != Activity.WAIT_ANSWER:
+                    if len(self.currentPath) > 0:
+                        p = self.currentPath.pop(0)
+                        if len(self.currentPath) > 0:
+                            self.currentPath.pop(0)
+                        return p
+                    else:
+                        self.currentStep.targetReached()
+
+                    # I've reached the point => I can execute the callback (if any)
+                    if self.currentStep.isTargetReached():
+                        if self.currentStep.onComplete is not None:
+                            self.currentStep.onComplete()
+                        self.currentStep = None
+                else:
+                    if self.currentStep.hasBeenAnswered():
+                        answer = self.currentStep.getAnswer()
+                        patient = self.currentStep.getPatient()
+                        if patient is not None:
+                            # TODO: prepend tasks to self.steps according user profile (use verificator and/or conditioner)
+                            if answer:
+                                # The patient said Yes
+                                self.robot.conversation = "Yes"
+                                self.activity = Activity.PATIENT_GIVE_PILL
+                                self.steps.insert(
+                                    0,
+                                    PlanStep(
+                                        patient.position,
+                                        Activity.PATIENT_GIVE_PILL,
+                                        "Entering into " + patient.name + "'s room",
+                                        patient=patient,
+                                        onComplete=lambda: (
+                                            self.robot.setConversation(""),
+                                        )
+                                    )
+                                )
+                            else:
+                                # The patiend said No
+                                self.steps = [
+                                    s for s in self.steps if s.getPatient() != patient
+                                ]
+                                self.robot.conversation = "No"
+                                self.steps.insert(
+                                    0,
+                                    PlanStep(
+                                        self.robot.world.findPlayer(
+                                            "nurse").position,
+                                        Activity.CALL_NURSE_FOR_PATIENT,
+                                        "Call Nurse for " + patient.name,
+                                        onComplete=lambda: (
+                                            self.robot.setConversation(""),
+                                        )
+                                    )
+                                )
+                                pass
+
+                        if self.currentStep.onComplete is not None:
+                            self.currentStep.onComplete()
+                        self.currentStep = None
+        return None
+
+    def compute_path(self, target):
+        return self.robot.world.findPath(self.robot.world, self.planner, self.robot.model.position, target)
+
+    def __str__(self):
+        return ""
 
 
 class Robot:
@@ -24,21 +205,17 @@ class Robot:
     def __init__(self, model, world):
         self.model = model
         self.world = world
-        self.planner = self.world.createPlanner()
         self.reset()
 
     def reset(self):
         self.model.position = self.world.robotBaseCoords()
-        self.activity = Activity.NONE
         self._delta = 0.05
         self.step = 0
         self.status = ""
         self.conversation = ""
-        self.answer = False
         self.pills = 0
-        self.path = []
-        self.goal = None
-        self.onComplete = None
+        self.base = self.world.robotBaseCoords()
+        self.planner = Planner(self)
 
     def setStatus(self, text):
         self.status = text
@@ -55,130 +232,32 @@ class Robot:
     def setConversation(self, text):
         self.conversation = text
 
-    def setGoal(self, goal, onComplete=None):
-        self.goal = goal
-        self.activity = Activity.MOVING
-        self.onComplete = onComplete
-
     def startDailyActivities(self):
-        self.setGoal(self.world.medicalRoomCoords(), lambda: (
-            self.setPills(2),
-            self.setGoal(self.world.robotBaseCoords(), lambda: (
-                self.setStatus("Pills taken!"),
-                self.setStatus("Pills taken!, Going to Alice's room!"),
-                self.setGoal(self.world.aliceRoomDoorCoords(), lambda: (
-                    self.setConversation("Alice, can I enter?"),
-                    self.setActivity(Activity.WAIT_ALICE_ANSWER),
-                )),
-            )),
-        ))
+        self.planner.reset()
 
     def update(self, dt=0, status_text=None, conversation_text=None):
         status_text.text = self.status
         conversation_text.text = self.conversation
-        if self.goal is not None:
-            self.path = self.world.findPath(
-                self.world, self.planner, self.model.position, self.goal)
-            self.goal = None
-        if self.path:
-            p = self.path.pop(0)
-            for i in range(0, 1):
-                if self.path:
-                    self.path.pop(0)
+
+        p = self.planner.process()
+        if p is not None:
             origin = self.model.world_position
             ignore = [self.model]
-            ignore.extend(self.world.players)
+            # ignore.extend(self.world.players)
             hit_info = raycast(origin, Vec3(p.x, p.y, 0),
                                ignore=ignore, distance=1, debug=False)
             if not hit_info.hit:
                 self.model.position = (p.x, p.y, 0)
-        else:
-            self.activity = Activity.NONE
-
-        if self.activity in [Activity.NONE, Activity.PILL_GIVEN]:
-            # call on complete
-            if self.onComplete is not None:
-                self.onComplete()
 
     def isWaitingAnswer(self):
-        return (self.activity == Activity.WAIT_ALICE_ANSWER or self.activity == Activity.WAIT_BOB_ANSWER)
+        return self.planner.isWaitingAnswer()
 
     def setAnswer(self, answer):
-        self.answer = answer
-        if self.answer:
-            if self.activity == Activity.WAIT_ALICE_ANSWER:
-                self.conversation += ", Yes"
-                self.status = "Pills taken!, Entering into Alice's room"
-                self.activity = Activity.ALICE_GIVE_PILL
-                self.setGoal(self.world.findPlayer("alice").position, lambda: (
-                    self.setStatus("Going to Bob's room!"),
-                    self.setConversation(""),
-                    self.setGoal(self.world.aliceRoomDoorCoords(), lambda: (
-                        self.setGoal(self.world.bobRoomDoorCoords(), lambda: (
-                            self.setConversation("Bob, can I enter?"),
-                            self.setActivity(Activity.WAIT_BOB_ANSWER),
-                        ))
-                    ))
-                ))
-            elif self.activity == Activity.WAIT_BOB_ANSWER:
-                self.conversation += ", Yes"
-                self.status = "Pills taken!, Entering into Bob's room"
-                self.activity = Activity.BOB_GIVE_PILL
-                self.setGoal(self.world.findPlayer("bob").position, lambda: (
-                    self.setStatus("Going to Base!"),
-                    self.setConversation(""),
-                    self.setGoal(self.world.bobRoomDoorCoords(), lambda: (
-                        self.setGoal(self.world.robotBaseCoords(), lambda: (
-                            self.setConversation(""),
-                            self.setStatus(
-                                "Base reached. I'll start another activity tomorrow"),
-                            self.setActivity(Activity.NONE),
-                        ))
-                    ))
-                ))
-        else:
-            if self.activity == Activity.WAIT_ALICE_ANSWER:
-                self.conversation += ", No"
-                self.setStatus("Call nurse for Alice!")
-                self.setGoal(self.world.findPlayer("nurse").position, lambda: (
-                    self.setConversation(""),
-                    self.setGoal(self.world.robotBaseCoords(), lambda: (
-                        self.setStatus("Going to Bob's room!"),
-                        self.setConversation(""),
-                        self.setGoal(self.world.aliceRoomDoorCoords(), lambda: (
-                            self.setGoal(self.world.bobRoomDoorCoords(), lambda: (
-                                self.setConversation("Bob, can I enter?"),
-                                self.setActivity(Activity.WAIT_BOB_ANSWER),
-                            ))
-                        ))
-                    ))
-                ))
-            elif self.activity == Activity.WAIT_BOB_ANSWER:
-                self.conversation += ", No"
-                self.setStatus("Call nurse for Bob!")
-                self.setGoal(self.world.findPlayer("nurse").position, lambda: (
-                    self.setConversation(""),
-                    self.setGoal(self.world.robotBaseCoords(), lambda: (
-                        self.setStatus(
-                             "Base reached. I'll start another activity tomorrow"),
-                        self.setActivity(Activity.NONE),
-                    ))
-                ))
+        self.planner.setAnswer(answer)
 
     def interactWith(self, model):
-        if model.name.lower() == "alice":
-            if self.activity == Activity.ALICE_GIVE_PILL:
-                self.activity = Activity.PILL_GIVEN
-                self.pills -= 1
-                self.status = "Pills taken!, Pill delivered to Alice"
-            else:
-                self.conversation = "Hi Alice!"
-        elif model.name.lower() == "bob":
-            if self.activity == Activity.BOB_GIVE_PILL:
-                self.activity = Activity.PILL_GIVEN
-                self.pills -= 1
-                self.status = "Pills taken!, Pill delivered to Bob"
-            else:
-                self.conversation = "Hi Bob!"
+        if self.planner.currentActivity() == Activity.PATIENT_GIVE_PILL:
+            self.pills -= 1
+            self.status = "Pills taken!, Pill delivered to " + model.name
         else:
             self.conversation = "Hi " + model.name + "!"
