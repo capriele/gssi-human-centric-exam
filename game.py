@@ -18,10 +18,15 @@ app = Ursina(size=(600, 600))
 class Player(Entity):
     entities = []
 
-    def __init__(self, name="Player", is_human=False, add_to_scene_entities=True, **kwargs):
+    def load_profile(self):
+        print("Load " + str(self.name) + " profile")
+        return []
+
+    def __init__(self, name="Player", is_human=False, is_staff=False, add_to_scene_entities=True, **kwargs):
         super().__init__(add_to_scene_entities=add_to_scene_entities, **kwargs)
         self.name = name
         self.is_human = is_human
+        self.is_staff = is_staff
         self.base_color = self.color
         self.collider = BoxCollider(
             self, center=Vec3(0, 0, 0), size=Vec3(2, 2, 2))
@@ -36,7 +41,7 @@ class Player(Entity):
         self.thread = threading.Thread(target=self.update_thread, args=())
         Player.entities.append(self)
         # TODO: uncomment to make the player moving
-        self.thread.start()
+        # self.thread.start()
         # self.collider.visible = True
 
     def update_thread(self):
@@ -55,11 +60,11 @@ class Player(Entity):
     def setWorld(self, world):
         self.world = world
         self.planner = self.world.createUserPlanner(self)
+        self.room = next(
+            (x for x in self.world.rooms if self.name.lower() in x.name.lower()), None)
         if self.name == "Alice":
-            self.room = self.world.aliceRoomDoorCoords()
             self.area = self.world.aliceMovementPolygon()
         elif self.name == "Bob":
-            self.room = self.world.bobRoomDoorCoords()
             self.area = self.world.bobMovementPolygon()
         else:
             self.room = self.initialPosition
@@ -130,7 +135,7 @@ alice = Player(model='cube', collider='sphere', name="Alice", is_human=True,
                color=color.pink, position=Vec3(6, 10, 0), scale=3)
 robot = Player(model='cube', collider='sphere', name="Robot", is_human=False,
                color=color.orange, position=Vec3(-8.66907, -10.6577, 0))
-nurse = Player(model='cube', collider='sphere', name="Nurse", is_human=True,
+nurse = Player(model='cube', collider='sphere', name="Nurse", is_human=True, is_staff=True,
                color=color.white, position=Vec3(-23, -10, 0), scale=3)
 
 
@@ -148,7 +153,7 @@ Wall(scale_x=1, scale_y=70*scale, scale_z=1, x=50*scale, y=15*scale, z=0)
 Wall(scale=(45*scale, 1, 1), position=(60*scale, -20*scale, 0))
 Wall(scale=(45*scale, 1, 1), position=(0*scale, -20*scale, 0))
 Wall(scale=(45*scale, 1, 1), position=(-60*scale, -20*scale, 0))
-world = World(Player.entities, Wall.entities, step=0.1, create_map=False)
+world = World(Player.entities, Wall.entities, step=0.1, create_map=True)
 bob.setWorld(world)
 alice.setWorld(world)
 nurse.setWorld(world)
@@ -202,7 +207,6 @@ def input(key):
         mx = 2*(mouse.position.x - ox) / (-0.6643332242965698)
         my = 2*(mouse.position.y - oy) / (0.32824939489364624)
         print(Vec3(30*mx, 15*my, 0))
-        robotClass.setGoal(Vec3(30*mx, 15*my, 0))
     '''
     elif key == 'scroll up':
         cp[0] += 0
