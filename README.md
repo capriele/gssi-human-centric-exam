@@ -11,6 +11,16 @@ On MacOS
 pip install -r requirements_macos.txt
 ```
 
+## Generate configuration.py
+
+`configuration.py` is auto-generated with generateDS: https://github.com/ricksladkey/generateDS .
+
+To re-generate `configuration.py` after a change of `schema_configuration.xsd`:
+
+```python
+python $PATH$/generateDS.py -o configuration.py configuration/schema_configuration.xsd
+```
+
 ## Useful links:
 - [Ursina](https://www.ursinaengine.org/)
 - [Robotics Toolbox Python](https://petercorke.github.io/robotics-toolbox-python)
