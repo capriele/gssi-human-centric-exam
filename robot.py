@@ -158,7 +158,7 @@ class Planner:
                             # TODO: prepend tasks to self.steps according user profile (use verificator and/or conditioner)
                             if answer:
                                 # The patient said Yes
-                                self.robot.conversation = "Yes"
+                                self.robot.conversation = Constants.ANSWER_YES
                                 self.activity = Activity.PATIENT_GIVE_PILL
                                 self.steps.insert(
                                     0,
@@ -177,7 +177,7 @@ class Planner:
                                 self.steps = [
                                     s for s in self.steps if s.getPatient() != patient
                                 ]
-                                self.robot.conversation = "No"
+                                self.robot.conversation = Constants.ANSWER_NO
                                 self.steps.insert(
                                     0,
                                     PlanStep(

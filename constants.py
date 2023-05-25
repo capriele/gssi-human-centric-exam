@@ -13,3 +13,6 @@ class Constants:
     KEY_NO = "n"
     KEY_RESET = "r"
     KEY_START = "s"
+    
+    ANSWER_YES = "Yes"
+    ANSWER_NO = "No"
