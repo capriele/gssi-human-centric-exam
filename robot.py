@@ -3,6 +3,10 @@ from enum import Enum
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
+from configurer import Configurer
+from constants import Constants
+from logger import Logger
+
 
 class Activity(Enum):
     NONE = 0
@@ -202,18 +206,23 @@ class Planner:
 
 class Robot:
 
-    def __init__(self, model, world):
+    def __init__(self, model, world, xml_configuration_file=""):
         self.model = model
         self.world = world
         self.reset()
+        
+        if xml_configuration_file:
+            self.configuration = Configurer().load_configuration(xml_configuration_file)
+            if (self.configuration):
+                Logger.s(f"Configuration loaded for Robot with Id: {self.configuration.get_id()} ")
 
     def reset(self):
         self.model.position = self.world.robotBaseCoords()
-        self._delta = 0.05
+        self._delta = Constants.ROBOT_INITIAL_DELTA
         self.step = 0
         self.status = ""
         self.conversation = ""
-        self.pills = 0
+        self.pills = Constants.ROBOT_INITIAL_NUMBER_OF_PILLS
         self.base = self.world.robotBaseCoords()
         self.planner = Planner(self)
 
@@ -244,8 +253,7 @@ class Robot:
             origin = self.model.world_position
             ignore = [self.model]
             # ignore.extend(self.world.players)
-            hit_info = raycast(origin, Vec3(p.x, p.y, 0),
-                               ignore=ignore, distance=1, debug=False)
+            hit_info = raycast(origin, Vec3(p.x, p.y, 0), ignore=ignore, distance=1, debug=False)
             if not hit_info.hit:
                 self.model.position = (p.x, p.y, 0)
 

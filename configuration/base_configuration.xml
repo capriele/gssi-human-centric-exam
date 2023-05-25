@@ -2,7 +2,7 @@
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <id>1</id>
     <name>Robot_1</name>
-    <color>#EEEEEE</color>
+    <color>orange</color>
     <description>Description 1</description>
 
     <hospital>
