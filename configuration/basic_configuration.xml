@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <id>1</id>
+    <name>Robot_1</name>
+    <color>#EEEEEE</color>
+    <description>Description 1</description>
+
+    <hospital>
+        <rooms>
+            <room>
+                <id>1</id>
+                <name>Room 1</name>
+                <patients>
+                    <patient>
+                        <name>Bob</name>
+                    </patient>
+                </patients>
+            </room>
+            <room>
+                <id>1</id>
+                <name>Room 2</name>
+                <patients>
+                    <patient>
+                        <name>Alice</name>
+                    </patient>
+                </patients>
+            </room>
+        </rooms>
+    </hospital>
+
+    <properties>
+        <property key="patient_humor" from="1" to="10"></property>
+        <property key="patient_humor_good" from="6" to="10"></property>
+        <property key="patient_humor_bad" from="1" to="5"></property>
+    </properties>
+
+    <behaviours>
+        <behaviour key="if_patient_humor_good">
+            <medicine_attempts>2</medicine_attempts>
+        </behaviour>
+        <behaviour key="if_patient_humor_bad">
+            <medicine_attempts>1</medicine_attempts>
+        </behaviour>
+    </behaviours>
+</configuration>
