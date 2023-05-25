@@ -272,14 +272,14 @@ def input(key):
 
 
 def update():
-    if held_keys["r"]:
+    if held_keys[Constants.KEY_RESET]:
         robotClass.reset()
-    if held_keys["s"]:
+    if held_keys[Constants.KEY_START]:
         robotClass.startDailyActivities()
     if robotClass.isWaitingAnswer():
-        if held_keys["y"]:
+        if held_keys[Constants.KEY_YES]:
             robotClass.setAnswer(True)
-        elif held_keys["n"]:
+        elif held_keys[Constants.KEY_NO]:
             robotClass.setAnswer(False)
     robotClass.update(
         dt=time.dt, status_text=status_text, conversation_text=conversation_text
@@ -300,7 +300,7 @@ Entity(
     model="plane", color=color.black, scale=200, rotation=(0, -90, 90)
 )  # , collider="box"
 
-window.title = "Human-Centric Simulation"
+window.title = Constants.WINDOW_TITLE
 window.borderless = False
 window.fullscreen = False
 window.exit_button.visible = True
