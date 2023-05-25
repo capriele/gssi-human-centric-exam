@@ -58,17 +58,43 @@ class PlanStep:
 
 
 class PlanVerificator:
+    def __init__(self, configuration):
+        self.configuration = configuration
+        
+    def verify(self, properties, value):
+        filtered_properties = [property for property in self.configuration.get_properties().get_property() if property.key in properties]
+        for property in filtered_properties:
+            if property.from_ >= value and value <= property.to:
+                Logger.i(f"Verifying the property {property.key}...")
+                return value <= [behaviour for behaviour in self.configuration.get_behaviours().get_behaviour() if behaviour.key in ["if_" + property.key]][0].medicine_attempts
+    
     def __str__(self):
         return
 
 
 class PlanConditioner:
+    
+    def __init__(self, status = 0):
+        self.status = status
+    
+    def inc(self, value = 1):
+        self.status += value
+        
+    def dec(self, value = 1):
+        self.status -= value
+        
+    def random(self, _from, to):
+        self.status = random.randint(_from, to)
+        return self.status
+    
     def __str__(self):
         return
 
 
 class Planner:
     def __init__(self, robot):
+        self.planConditioners = { "pill_attempts": PlanConditioner(0)}
+        self.planVerificators = { "patient_humor": PlanVerificator(robot.configuration)}
         self.robot = robot
         self.planner = self.robot.world.createPlanner()
         self.medical_room = next(
@@ -94,7 +120,7 @@ class Planner:
         # Patient based steps
         for p in self.robot.world.patientsList():
             status1 = "Going to " + p.name + " Room"
-            status2 = p.name + ", can I enter?"
+            status2 = f"Attempt number {self.planConditioners['pill_attempts'].status}. {p.name}, can I enter?"
             self.steps.extend([
                 PlanStep(p.room.door, Activity.MOVING, status1, patient=p),
                 PlanStep(None, Activity.WAIT_ANSWER, status2, patient=p),
@@ -160,6 +186,7 @@ class Planner:
                                 # The patient said Yes
                                 self.robot.conversation = Constants.ANSWER_YES
                                 self.activity = Activity.PATIENT_GIVE_PILL
+                                self.planConditioners["pill_attempts"].dec()
                                 self.steps.insert(
                                     0,
                                     PlanStep(
@@ -173,24 +200,37 @@ class Planner:
                                     )
                                 )
                             else:
-                                # The patiend said No
+                                # The patient said No
                                 self.steps = [
                                     s for s in self.steps if s.getPatient() != patient
                                 ]
                                 self.robot.conversation = Constants.ANSWER_NO
-                                self.steps.insert(
-                                    0,
-                                    PlanStep(
-                                        self.robot.world.findPlayer(
-                                            "nurse").position,
-                                        Activity.CALL_NURSE_FOR_PATIENT,
-                                        "Call Nurse for " + patient.name,
-                                        onComplete=lambda: (
-                                            self.robot.setConversation(""),
+                                self.planConditioners["pill_attempts"].inc()
+                                
+                                patientHumorConfiguration = self.robot.configuration.get_properties().get_property()[0]
+                                
+                                patientHumor =  self.planConditioners["pill_attempts"].random(patientHumorConfiguration.from_, patientHumorConfiguration.to)
+                                Logger.i(f"Patient Humor Score: {patientHumor}")
+                                
+                                if (self.planVerificators["patient_humor"].verify(["patient_humor_good", "patient_humor_bad"], patientHumor)):
+                                    self.steps.insert(
+                                        0,
+                                        PlanStep(None, Activity.WAIT_ANSWER, status = f"Attempt number {self.planConditioners['pill_attempts'].status}. {patient.name}, can I enter?", patient=patient),
+                                    )
+                                else:
+                                    self.steps.insert(
+                                        0,
+                                        PlanStep(
+                                            self.robot.world.findPlayer(
+                                                "nurse").position,
+                                            Activity.CALL_NURSE_FOR_PATIENT,
+                                            "Call Nurse for " + patient.name,
+                                            onComplete=lambda: (
+                                                self.robot.setConversation(""),
+                                            )
                                         )
                                     )
-                                )
-                                pass
+                                pass 
 
                         if self.currentStep.onComplete is not None:
                             self.currentStep.onComplete()
@@ -209,11 +249,12 @@ class Robot:
     def __init__(self, model, world, configuration=None):
         self.model = model
         self.world = world
-        self.reset()
         
         if configuration:
             self.configuration = configuration
             Logger.s(f"Configuration loaded for Robot with Id: {self.configuration.get_id()} ")
+        
+        self.reset()
 
     def reset(self):
         self.model.position = self.world.robotBaseCoords()
