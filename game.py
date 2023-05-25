@@ -280,6 +280,7 @@ def update():
         if held_keys[Constants.KEY_YES]:
             robotClass.setAnswer(True)
         elif held_keys[Constants.KEY_NO]:
+            
             robotClass.setAnswer(False)
     robotClass.update(
         dt=time.dt, status_text=status_text, conversation_text=conversation_text

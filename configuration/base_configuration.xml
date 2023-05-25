@@ -36,10 +36,10 @@
 
     <behaviours>
         <behaviour key="if_patient_humor_good">
-            <medicine_attempts>2</medicine_attempts>
+            <medicine_attempts>4</medicine_attempts>
         </behaviour>
         <behaviour key="if_patient_humor_bad">
-            <medicine_attempts>1</medicine_attempts>
+            <medicine_attempts>2</medicine_attempts>
         </behaviour>
     </behaviours>
 </configuration>

@@ -22,3 +22,13 @@ class Logger:
         - msg (str): The success message to be logged.
         """
         print(f"[Success]: {msg}")
+        
+    @staticmethod
+    def i(msg):
+        """
+        Logs a info message.
+
+        Parameters:
+        - msg (str): The info message to be logged.
+        """
+        print(f"[Info]: {msg}")
