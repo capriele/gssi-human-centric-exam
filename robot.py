@@ -206,15 +206,14 @@ class Planner:
 
 class Robot:
 
-    def __init__(self, model, world, xml_configuration_file=""):
+    def __init__(self, model, world, configuration=None):
         self.model = model
         self.world = world
         self.reset()
         
-        if xml_configuration_file:
-            self.configuration = Configurer().load_configuration(xml_configuration_file)
-            if (self.configuration):
-                Logger.s(f"Configuration loaded for Robot with Id: {self.configuration.get_id()} ")
+        if configuration:
+            self.configuration = configuration
+            Logger.s(f"Configuration loaded for Robot with Id: {self.configuration.get_id()} ")
 
     def reset(self):
         self.model.position = self.world.robotBaseCoords()
