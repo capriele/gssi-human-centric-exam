@@ -207,7 +207,7 @@ world = World(Player.entities, Wall.entities, step=0.1, create_map=True)
 bob.setWorld(world)
 alice.setWorld(world)
 nurse.setWorld(world)
-robotClass = Robot(robot, world, Constants.CONFIGURATION_BASE_XML_FILE)
+robotClass = Robot(robot, world, robot_configuration)
 
 Text("Living Room", color=color.green, position=(0.46, 0.38, 0), scale=0.7)
 
