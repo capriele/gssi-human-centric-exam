@@ -61,12 +61,12 @@ class PlanVerificator:
     def __init__(self, configuration):
         self.configuration = configuration
         
-    def verify(self, properties, value):
+    def verify(self, properties, patient_value, robot_value):
         filtered_properties = [property for property in self.configuration.get_properties().get_property() if property.key in properties]
         for property in filtered_properties:
-            if property.from_ >= value and value <= property.to:
-                Logger.i(f"Verifying the property {property.key}...")
-                return value <= [behaviour for behaviour in self.configuration.get_behaviours().get_behaviour() if behaviour.key in ["if_" + property.key]][0].medicine_attempts
+            if property.from_ <= patient_value and patient_value <= property.to:
+                Logger.i(f"Verifying the property if_{property.key}...")
+                return robot_value <= [behaviour for behaviour in self.configuration.get_behaviours().get_behaviour() if behaviour.key in ["if_" + property.key]][0].medicine_attempts
     
     def __str__(self):
         return
@@ -83,9 +83,11 @@ class PlanConditioner:
     def dec(self, value = 1):
         self.status -= value
         
+    def reset(self):
+        self.status = 0
+        
     def random(self, _from, to):
-        self.status = random.randint(_from, to)
-        return self.status
+        return random.randint(_from, to)
     
     def __str__(self):
         return
@@ -120,7 +122,7 @@ class Planner:
         # Patient based steps
         for p in self.robot.world.patientsList():
             status1 = "Going to " + p.name + " Room"
-            status2 = f"Attempt number {self.planConditioners['pill_attempts'].status}. {p.name}, can I enter?"
+            status2 = f"Attempt number {self.planConditioners['pill_attempts'].status + 1}. {p.name}, can I enter?"
             self.steps.extend([
                 PlanStep(p.room.door, Activity.MOVING, status1, patient=p),
                 PlanStep(None, Activity.WAIT_ANSWER, status2, patient=p),
@@ -186,7 +188,7 @@ class Planner:
                                 # The patient said Yes
                                 self.robot.conversation = Constants.ANSWER_YES
                                 self.activity = Activity.PATIENT_GIVE_PILL
-                                self.planConditioners["pill_attempts"].dec()
+                                self.planConditioners["pill_attempts"].reset()
                                 self.steps.insert(
                                     0,
                                     PlanStep(
@@ -205,19 +207,21 @@ class Planner:
                                     s for s in self.steps if s.getPatient() != patient
                                 ]
                                 self.robot.conversation = Constants.ANSWER_NO
-                                self.planConditioners["pill_attempts"].inc()
                                 
                                 patientHumorConfiguration = self.robot.configuration.get_properties().get_property()[0]
                                 
                                 patientHumor =  self.planConditioners["pill_attempts"].random(patientHumorConfiguration.from_, patientHumorConfiguration.to)
                                 Logger.i(f"Patient Humor Score: {patientHumor}")
                                 
-                                if (self.planVerificators["patient_humor"].verify(["patient_humor_good", "patient_humor_bad"], patientHumor)):
+                                self.planConditioners["pill_attempts"].inc()
+                                Logger.i(f"Number of attempts: {self.planConditioners['pill_attempts'].status}")
+                                if (self.planVerificators["patient_humor"].verify(["patient_humor_good", "patient_humor_bad"], patientHumor, self.planConditioners["pill_attempts"].status)):
                                     self.steps.insert(
                                         0,
-                                        PlanStep(None, Activity.WAIT_ANSWER, status = f"Attempt number {self.planConditioners['pill_attempts'].status}. {patient.name}, can I enter?", patient=patient),
+                                        PlanStep(None, Activity.WAIT_ANSWER, status = f"Attempt number {self.planConditioners['pill_attempts'].status + 1}. {patient.name}, can I enter?", patient=patient),
                                     )
                                 else:
+                                    self.planConditioners["pill_attempts"].reset()
                                     self.steps.insert(
                                         0,
                                         PlanStep(
