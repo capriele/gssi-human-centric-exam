@@ -16,3 +16,5 @@ class Constants:
     
     ANSWER_YES = "Yes"
     ANSWER_NO = "No"
+    
+    TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS = 5
