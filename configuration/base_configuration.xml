@@ -35,11 +35,9 @@
     </properties>
 
     <behaviours>
-        <behaviour key="if_patient_humor_good">
-            <medicine_attempts>4</medicine_attempts>
+        <behaviour key="if_patient_humor_good" value="4">
         </behaviour>
-        <behaviour key="if_patient_humor_bad">
-            <medicine_attempts>2</medicine_attempts>
+        <behaviour key="if_patient_humor_bad" value="2">
         </behaviour>
     </behaviours>
 </configuration>
