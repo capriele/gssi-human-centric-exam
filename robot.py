@@ -214,7 +214,7 @@ class Planner:
                                 Logger.i(f"Patient Humor Score: {patientHumor}")
                                 
                                 self.planConditioners["pill_attempts"].inc()
-                                Logger.i(f"Number of attempts: {self.planConditioners['pill_attempts'].status}")
+                                Logger.i(f"Number of attempts: {self.planConditioners['pill_attempts'].status + 1}")
                                 if (self.planVerificators["patient_humor"].verify(["patient_humor_good", "patient_humor_bad"], patientHumor, self.planConditioners["pill_attempts"].status)):
                                     self.steps.insert(
                                         0,

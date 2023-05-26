@@ -6,10 +6,12 @@ from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 from configurer import Configurer
 from constants import Constants
+from logger import Logger
 from robot import Robot
 import random
 from world import World
 from roboticstoolbox import DistanceTransformPlanner
+import asyncio
 
 import threading
 import time
@@ -271,17 +273,47 @@ def input(key):
     """
 
 
+pressed_key = None
+
+def unset_pressed_key(seconds):
+    global pressed_key
+    time.sleep(seconds)
+    Logger.i("Keys re-enabled...")
+    pressed_key = None
+    
+def disable_held_keys(key):
+    global pressed_key
+    Logger.i(f"Disabling keys for {Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS} seconds...")
+    lock = threading.Lock()
+    lock.acquire()
+    pressed_key = key
+    thread = threading.Thread(target=unset_pressed_key, args=[Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS])
+    thread.start()
+    lock.release()
+    
 def update():
-    if held_keys[Constants.KEY_RESET]:
-        robotClass.reset()
-    if held_keys[Constants.KEY_START]:
-        robotClass.startDailyActivities()
-    if robotClass.isWaitingAnswer():
-        if held_keys[Constants.KEY_YES]:
-            robotClass.setAnswer(True)
-        elif held_keys[Constants.KEY_NO]:
-            
-            robotClass.setAnswer(False)
+    global pressed_key
+        
+    if pressed_key == None:
+        
+        if held_keys[Constants.KEY_RESET]:
+            Logger.i(f"Pressed key {held_keys[Constants.KEY_RESET]}...")
+            disable_held_keys(Constants.KEY_RESET)
+            robotClass.reset()
+        if held_keys[Constants.KEY_START]:
+            Logger.i(f"Pressed key {held_keys[Constants.KEY_START]}...")
+            disable_held_keys(Constants.KEY_START)
+            robotClass.startDailyActivities()
+        if robotClass.isWaitingAnswer():
+            if held_keys[Constants.KEY_YES]:
+                Logger.i(f"Pressed key {held_keys[Constants.KEY_YES]}...")
+                disable_held_keys(Constants.KEY_YES)
+                robotClass.setAnswer(True)
+            elif held_keys[Constants.KEY_NO]:
+                Logger.i(f"Pressed key {held_keys[Constants.KEY_NO]}...")
+                disable_held_keys(Constants.KEY_NO)
+                robotClass.setAnswer(False)
+    
     robotClass.update(
         dt=time.dt, status_text=status_text, conversation_text=conversation_text
     )
