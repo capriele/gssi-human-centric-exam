@@ -66,7 +66,7 @@ class PlanVerificator:
         for property in filtered_properties:
             if property.from_ <= patient_value and patient_value <= property.to:
                 Logger.i(f"Verifying the property if_{property.key}...")
-                return robot_value <= [behaviour for behaviour in self.configuration.get_behaviours().get_behaviour() if behaviour.key in ["if_" + property.key]][0].medicine_attempts
+                return robot_value <= [behaviour for behaviour in self.configuration.get_behaviours().get_behaviour() if behaviour.key in ["if_" + property.key]][0].value
     
     def __str__(self):
         return

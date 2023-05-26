@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Thu May 25 12:51:09 2023 by generateDS.py version 2.12a.
+# Generated Fri May 26 13:05:43 2023 by generateDS.py version 2.12a.
 #
 
 import sys
@@ -1497,22 +1497,25 @@ class behavioursType(GeneratedsSuper):
 class behaviourType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, key=None, medicine_attempts=None):
+    def __init__(self, key=None, value=None, valueOf_=None):
         self.key = _cast(None, key)
-        self.medicine_attempts = medicine_attempts
+        self.value = _cast(int, value)
+        self.valueOf_ = valueOf_
     def factory(*args_, **kwargs_):
         if behaviourType.subclass:
             return behaviourType.subclass(*args_, **kwargs_)
         else:
             return behaviourType(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_medicine_attempts(self): return self.medicine_attempts
-    def set_medicine_attempts(self, medicine_attempts): self.medicine_attempts = medicine_attempts
     def get_key(self): return self.key
     def set_key(self, key): self.key = key
+    def get_value(self): return self.value
+    def set_value(self, value): self.value = value
+    def get_valueOf_(self): return self.valueOf_
+    def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
     def hasContent_(self):
         if (
-            self.medicine_attempts is not None
+            self.valueOf_
         ):
             return True
         else:
@@ -1527,9 +1530,9 @@ class behaviourType(GeneratedsSuper):
         already_processed = set()
         self.exportAttributes(outfile, level, already_processed, namespace_, name_='behaviourType')
         if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
+            outfile.write('>')
+            outfile.write(str(self.valueOf_))
             self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
             outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
@@ -1537,32 +1540,34 @@ class behaviourType(GeneratedsSuper):
         if self.key is not None and 'key' not in already_processed:
             already_processed.add('key')
             outfile.write(' key=%s' % (self.gds_format_string(quote_attrib(self.key), input_name='key'), ))
+        if self.value is not None and 'value' not in already_processed:
+            already_processed.add('value')
+            outfile.write(' value="%s"' % self.gds_format_integer(self.value, input_name='value'))
     def exportChildren(self, outfile, level, namespace_='', name_='behaviourType', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.medicine_attempts is not None:
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%smedicine_attempts>%s</%smedicine_attempts>%s' % (namespace_, self.gds_format_integer(self.medicine_attempts, input_name='medicine_attempts'), namespace_, eol_))
+        pass
     def exportLiteral(self, outfile, level, name_='behaviourType'):
         level += 1
         already_processed = set()
         self.exportLiteralAttributes(outfile, level, already_processed, name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
+        showIndent(outfile, level)
+        outfile.write('valueOf_ = """%s""",\n' % (self.valueOf_,))
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         if self.key is not None and 'key' not in already_processed:
             already_processed.add('key')
             showIndent(outfile, level)
             outfile.write('key="%s",\n' % (self.key,))
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.medicine_attempts is not None:
+        if self.value is not None and 'value' not in already_processed:
+            already_processed.add('value')
             showIndent(outfile, level)
-            outfile.write('medicine_attempts=%d,\n' % self.medicine_attempts)
+            outfile.write('value=%d,\n' % (self.value,))
+    def exportLiteralChildren(self, outfile, level, name_):
+        pass
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
+        self.valueOf_ = get_all_text_(node)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
@@ -1572,15 +1577,15 @@ class behaviourType(GeneratedsSuper):
         if value is not None and 'key' not in already_processed:
             already_processed.add('key')
             self.key = value
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == 'medicine_attempts':
-            sval_ = child_.text
+        value = find_attr_value_('value', node)
+        if value is not None and 'value' not in already_processed:
+            already_processed.add('value')
             try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError) as exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
-            ival_ = self.gds_validate_integer(ival_, node, 'medicine_attempts')
-            self.medicine_attempts = ival_
+                self.value = int(value)
+            except ValueError as exp:
+                raise_parse_error(node, 'Bad integer attribute: %s' % exp)
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        pass
 # end class behaviourType
 
 
