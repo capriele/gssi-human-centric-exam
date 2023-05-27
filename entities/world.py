@@ -1,20 +1,10 @@
 from ursina import *
-import matplotlib.pyplot as plt
 from roboticstoolbox import *
 import numpy as np
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 import scipy
-
-
-class Room:
-    def __init__(self, name, door, polygon):
-        self.name = name
-        self.door = door
-        self.polygon = polygon
-
-    def __str__(self):
-        return self.name
+from .room import *
 
 
 class World:
