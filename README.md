@@ -30,7 +30,16 @@ python $PATH$/generateDS.py -o configuration.py configuration/schema_configurati
 - [ ] Load user from XML
 - [ ] ??Automatically generate map from XML??
 
-## Robot daily job
+## Exam Solution
+This software simulate in a 3D environment three human profiles (Bob, Alice and Nurse) and a robot that interacts with these characters and move inside the clinic. 
+In particular we implemented the following profiles for Bob and Alice.
+- Bob profile: If I will refuse the medications or to take pills, it is fine that the robot insists a few times. However, after a few attempts it should call the nurse. I accept that the robot uses cameras and microphones, however all my data cannot be distributed to third parties. Moreover, the robot can only store and/or distribute to the nurse videos and audios that are strictly necessary for my health, and in any case videos cannot be recorded in the toilet.
+- Alice profile: I accept having assistive robots checking my health status and supporting me, however, when I show signals of distress, the robot should put me in contact with my daughter by making a video call; if she does not answer the robot should ask the intervention of a nurse and leave my room if I will be in my room of move away from me.
+
+In order to simulate human emotions we simply press a specific key on the keyboard.
+
+### Robot daily job
+The image below summarize all the tasks that the robot will daily execute in a behavioural tree.
 ![Robot daily job](./images/daily_jobs.png)
 
 ## Useful links:
@@ -39,3 +48,4 @@ python $PATH$/generateDS.py -o configuration.py configuration/schema_configurati
 - [Bug2 Planner](https://automaticaddison.com/the-bug2-algorithm-for-robot-motion-planning/)
 - [Distance transform: Base](https://robotics102.github.io/lectures/rob102_07_distance_transform.pdf)
 - [Distance transform: Potential fields](https://robotics102.github.io/lectures/rob102_08_potential_field.pdf)
+- [Behavioural Tree](https://roboticseabass.com/2021/05/08/introduction-to-behavior-trees/)
