@@ -1,7 +1,4 @@
 from ursina import *
-from enum import Enum
-from shapely.geometry import Point
-from shapely.geometry.polygon import Polygon
 
 from configurer import Configurer
 from constants import Constants
