@@ -37,13 +37,12 @@ alice = Player(
 
 
 robot_configuration = Configurer().load_base_configuration()
-
 robot = Player(
     model="cube",
     collider="sphere",
     name=robot_configuration.get_name(),
     is_human=False,
-    color=color.orange,
+    color=color.hex(robot_configuration.get_color()),
     position=Vec3(-8.66907, -10.6577, 0),
 )
 
