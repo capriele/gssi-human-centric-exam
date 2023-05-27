@@ -101,6 +101,7 @@ class InteractionAction(py_trees.behaviour.Behaviour):
         self.startTime = time.time()
 
     def initialise(self) -> None:
+        self.planner.robot.conversation = ""
         self.startTime = time.time()
 
     def setAnswer(self, answer):
@@ -134,7 +135,11 @@ class InteractionAction(py_trees.behaviour.Behaviour):
                         )
                 else:
                     # The patient said No
-                    self.planner.robot.conversation = Constants.ANSWER_NO
+                    if self.planner.planConditioners['pill_attempts'].status + 1 > 1:
+                        self.planner.robot.conversation += ", "
+                    self.planner.robot.conversation += Constants.ANSWER_NO
+                    self.planner.robot.conversation = self.planner.robot.conversation.rstrip(
+                        ',')
                     patientHumorConfiguration = self.planner.robot.configuration.get_properties().get_property()[
                         0]
                     patientHumor = self.planner.planConditioners["pill_attempts"].random(
@@ -149,7 +154,7 @@ class InteractionAction(py_trees.behaviour.Behaviour):
                     Logger.i(
                         f"Number of attempts: {self.planner.planConditioners['pill_attempts'].status + 1}")
                     if self.planner.planVerificators["patient_humor"].verify(["patient_humor_good", "patient_humor_bad"], patientHumor, self.planner.planConditioners["pill_attempts"].status):
-                        pass
+                        self._answer = None
                     else:
                         new_status = py_trees.common.Status.SUCCESS
                         self.planner.planConditioners["pill_attempts"].reset()
