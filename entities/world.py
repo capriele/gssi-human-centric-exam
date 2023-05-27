@@ -160,7 +160,7 @@ class World:
                 patients.append(p)
         return patients
 
-    def __init__(self, players, walls, step=0.1, create_map=False, use_distance_transform=False):
+    def __init__(self, players, walls, step=0.1, world_creator=None, create_map=False, use_distance_transform=False):
         self.players = players
         self.walls = walls
         self.step = step
@@ -171,32 +171,35 @@ class World:
         self.use_distance_transform = use_distance_transform
 
         # create all the rooms
-        self.rooms = [
-            Room(
-                name="Medical Room",
-                door=Point(-8.66907, 10.0107),
-            ),
-            Room(
-                name="Alice Room",
-                door=Point(9.51363, -7.97634),
-                polygon=Polygon([
-                    self.map2point(Point(93, 444)),
-                    self.map2point(Point(93, 303)),
-                    self.map2point(Point(293, 303)),
-                    self.map2point(Point(293, 444)),
-                ]),
-            ),
-            Room(
-                name="Bob Room",
-                door=Point(27.6749, -8.15384),
-                polygon=Polygon([
-                    self.map2point(Point(93, 593)),
-                    self.map2point(Point(93, 453)),
-                    self.map2point(Point(293, 453)),
-                    self.map2point(Point(293, 593)),
-                ]),
-            ),
-        ]
+        if world_creator is not None:
+            self.rooms = world_creator.rooms
+        else:
+            self.rooms = [
+                Room(
+                    name="Medical Room",
+                    door=Point(-8.66907, 10.0107),
+                ),
+                Room(
+                    name="Alice Room",
+                    door=Point(9.51363, -7.97634),
+                    polygon=Polygon([
+                        self.map2point(Point(93, 444)),
+                        self.map2point(Point(93, 303)),
+                        self.map2point(Point(293, 303)),
+                        self.map2point(Point(293, 444)),
+                    ]),
+                ),
+                Room(
+                    name="Bob Room",
+                    door=Point(27.6749, -8.15384),
+                    polygon=Polygon([
+                        self.map2point(Point(93, 593)),
+                        self.map2point(Point(93, 453)),
+                        self.map2point(Point(293, 453)),
+                        self.map2point(Point(293, 593)),
+                    ]),
+                ),
+            ]
 
         if create_map:
             x_range = np.arange(self.x_min, self.x_max, self.step)
@@ -229,8 +232,11 @@ class World:
             self.map[:, -1] = 1
             scipy.io.savemat('./data/map.mat', {'map': self.map})
         else:
-            house = scipy.io.loadmat("./data/map.mat")
-            self.map = house["map"]
+            if world_creator is not None:
+                self.map = world_creator.map
+            else:
+                house = scipy.io.loadmat("./data/map.mat")
+                self.map = house["map"]
 
         self.user_map = self.map.copy()
         self.user_map[550:600, 20:70] = 0

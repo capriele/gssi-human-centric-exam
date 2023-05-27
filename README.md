@@ -27,8 +27,8 @@ python $PATH$/generateDS.py -o configuration.py configuration/schema_configurati
 - [x] Implement robot daily job using behavioural trees
 - [x] Implement User-Robot interaction throught keyboard
 - [x] Implement PathPlanner, Verificator and Conditioner
-- [ ] Load user from XML
-- [ ] ??Automatically generate map from XML??
+- [x] Load user from XML
+- [x] Automatically generate map from XML
 
 ## Exam Solution
 This software simulate in a 3D environment three human profiles (Bob, Alice and Nurse) and a robot that interacts with these characters and move inside the clinic. 
