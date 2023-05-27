@@ -3,8 +3,10 @@ colored==1.4.4
 contourpy==1.0.7
 cycler==0.11.0
 Cython==0.29.34
+elementpath==4.1.2
 fonttools==4.39.4
 kiwisolver==1.4.4
+lxml==4.9.2
 matplotlib==3.7.1
 numpy==1.24.3
 packaging==23.1
@@ -14,6 +16,8 @@ panda3d-simplepbr==0.10
 pgraph-python==0.6.2
 Pillow==9.5.0
 progress==1.6
+py-trees==2.2.3
+pydot==1.4.2
 pygame==2.4.0
 pyobjc-core==9.1.1
 pyobjc-framework-Cocoa==9.1.1
