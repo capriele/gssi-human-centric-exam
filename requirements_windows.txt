@@ -1,7 +1,11 @@
+cElementTree==1.0.2-20050302
+elementtree==1.2.6-20050316
+lxml==4.9.2
 matplotlib==3.7.1
 numpy==1.24.3
 roboticstoolbox_python==1.1.0
 scipy==1.10.1
 Shapely==2.0.1
 ursina==5.3.0
+webcolors==1.13
 xmlschema==2.3.0

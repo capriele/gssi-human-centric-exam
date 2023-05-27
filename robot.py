@@ -7,96 +7,53 @@ from configurer import Configurer
 from constants import Constants
 from logger import Logger
 
-
-class Activity(Enum):
-    NONE = 0
-    MOVING = 1
-    GO_TO_MEDICAL_ROOM = 2
-    GO_TO_PATIENT = 3
-    WAIT_ANSWER = 5
-    PATIENT_GIVE_PILL = 6
-    CALL_NURSE_FOR_PATIENT = 7
-    TAKE_PILLS = 8
-    PILL_GIVEN = 9
-
-
-class PlanStep:
-
-    @staticmethod
-    def none():
-        return PlanStep(None)
-
-    def __init__(self, target=Point(0, 0), activity=Activity.NONE, status=None, onComplete=None, patient=None):
-        self.target = target
-        self.activity = activity
-        self.status = status
-        self.onComplete = onComplete
-        self._isTargetReached = False
-        self._answer = None
-        self._patient = patient
-
-    def targetReached(self):
-        self._isTargetReached = True
-
-    def isTargetReached(self):
-        return self._isTargetReached
-
-    def setAnswer(self, value):
-        self._answer = value
-
-    def getAnswer(self):
-        return self._answer
-
-    def hasBeenAnswered(self):
-        return self._answer != None
-
-    def getPatient(self):
-        return self._patient
-
-    def __str__(self):
-        return
+from actions import *
+import py_trees
+import operator
 
 
 class PlanVerificator:
     def __init__(self, configuration):
         self.configuration = configuration
-        
+
     def verify(self, properties, patient_value, robot_value):
-        filtered_properties = [property for property in self.configuration.get_properties().get_property() if property.key in properties]
+        filtered_properties = [property for property in self.configuration.get_properties(
+        ).get_property() if property.key in properties]
         for property in filtered_properties:
             if property.from_ <= patient_value and patient_value <= property.to:
                 Logger.i(f"Verifying the property if_{property.key}...")
                 return robot_value <= [behaviour for behaviour in self.configuration.get_behaviours().get_behaviour() if behaviour.key in ["if_" + property.key]][0].value
-    
+
     def __str__(self):
         return
 
 
 class PlanConditioner:
-    
-    def __init__(self, status = 0):
+
+    def __init__(self, status=0):
         self.status = status
-    
-    def inc(self, value = 1):
+
+    def inc(self, value=1):
         self.status += value
-        
-    def dec(self, value = 1):
+
+    def dec(self, value=1):
         self.status -= value
-        
+
     def reset(self):
         self.status = 0
-        
+
     def random(self, _from, to):
         return random.randint(_from, to)
-    
+
     def __str__(self):
         return
 
 
 class Planner:
     def __init__(self, robot):
-        self.planConditioners = { "pill_attempts": PlanConditioner(0)}
-        self.planVerificators = { "patient_humor": PlanVerificator(robot.configuration)}
+        self.planConditioners = {"pill_attempts": PlanConditioner(0)}
+        self.planVerificators = {
+            "patient_humor": PlanVerificator(robot.configuration)}
         self.robot = robot
         self.planner = self.robot.world.createPlanner()
         self.medical_room = next(
@@ -104,141 +61,173 @@ class Planner:
         self.currentStep = None
         self.currentPath = []
         self.steps = []
+        self.behaviour_tree = None
+        self.blackboard = py_trees.blackboard.Blackboard()
+        for p in self.robot.world.patientsList():
+            self.blackboard.set(p.name.lower()+"_can_enter", False)
 
     def reset(self):
         # Standard steps
-        self.steps = [
-            PlanStep.none(),
-            PlanStep(self.medical_room.door, Activity.MOVING,
-                     "Going to the Medical Room for taking the pills"),
-            PlanStep(None, Activity.TAKE_PILLS, None, lambda: (
-                self.robot.setPills(self.robot.world.patientsCount()),
-            )),
-            PlanStep(self.robot.base, Activity.MOVING, str(
-                self.robot.world.patientsCount()) + " pills taken"),
-            PlanStep.none(),
-        ]
+        start_root = py_trees.composites.Sequence("Daily Jobs", memory=True)
+        start_root.add_children([
+            py_trees.composites.Sequence(
+                "Go to medical room",
+                memory=True,
+            ).add_children([
+                MovingAction(
+                    name="Moving to Medical Room",
+                    planner=self,
+                    target=self.medical_room.door
+                ),
+                ExecutionAction(
+                    name="Take Pills",
+                    onComplete=lambda: (
+                        print("Pills Taken"),
+                        self.robot.setPills(self.robot.world.patientsCount()),
+                    ),
+                ),
+                MovingAction(
+                    name="Going back to base",
+                    planner=self,
+                    target=self.robot.base
+                ),
+            ]),
+        ])
 
         # Patient based steps
         for p in self.robot.world.patientsList():
-            status1 = "Going to " + p.name + " Room"
-            status2 = f"Attempt number {self.planConditioners['pill_attempts'].status + 1}. {p.name}, can I enter?"
-            self.steps.extend([
-                PlanStep(p.room.door, Activity.MOVING, status1, patient=p),
-                PlanStep(None, Activity.WAIT_ANSWER, status2, patient=p),
-                PlanStep(p.room.door, Activity.MOVING, patient=p),
+            start_root.add_children([
+                py_trees.composites.Sequence(
+                    "Visiting " + p.name,
+                    memory=True,
+                ).add_children([
+                    MovingAction(
+                        name="Going to " + p.name + " Room",
+                        planner=self,
+                        patient=p,
+                        target=p.room.door,
+                    ),
+                    InteractionAction(
+                        name=p.name + ", can I enter?",
+                        planner=self,
+                        patient=p,
+                        onComplete=lambda: (),
+                    ),
+                    py_trees.idioms.either_or(
+                        name="Interacting with " + p.name,
+                        conditions=[
+                            py_trees.common.ComparisonExpression(
+                                p.name.lower()+"_can_enter", True, operator.eq),
+                            py_trees.common.ComparisonExpression(
+                                p.name.lower()+"_can_enter", False, operator.eq),
+                        ],
+                        subtrees=[
+                            py_trees.composites.Sequence(
+                                "Visiting " + p.name,
+                                memory=True,
+                            ).add_children([
+                                MovingAction(
+                                    name="Give pill to " + p.name,
+                                    planner=self,
+                                    patient=p,
+                                    target=p.position,
+                                ),
+                                ExecutionAction(
+                                    name=p.name + " takes the pill",
+                                    onComplete=lambda: (
+                                        self.robot.decreasePills(),
+                                    ),
+                                ),
+                                MovingAction(
+                                    name="Exiting from " + p.name + " Room",
+                                    planner=self,
+                                    patient=p,
+                                    target=p.room.door,
+                                ),
+                            ]),
+                            py_trees.composites.Sequence(
+                                "Visiting " + p.name,
+                                memory=True,
+                            ).add_children([
+                                MovingAction(
+                                    name="Calling the nurse",
+                                    planner=self,
+                                    patient=p,
+                                    target=self.robot.world.findPlayer(
+                                        "nurse").position,
+                                ),
+                                MovingAction(
+                                    name="Going back to base",
+                                    planner=self,
+                                    target=self.robot.base
+                                ),
+                            ]),
+                        ],
+                        namespace=p.name.lower()+"_either_or",
+                    ),
+                ])
             ])
 
         # Standard steps
-        self.steps.extend([
-            PlanStep(self.robot.base, Activity.MOVING, "Going to the Base"),
-            PlanStep(None, Activity.NONE,
-                     "All the tasks completed for today. See you tomorrow!"),
+        start_root.add_children([
+            py_trees.composites.Sequence(
+                "Daily tasks completed",
+                memory=True,
+            ).add_children([
+                MovingAction(
+                    name="Going to the Base",
+                    planner=self,
+                    target=self.robot.base
+                ),
+                ExecutionAction(
+                    name="Going to sleep",
+                    onComplete=lambda: (
+                        self.processCompleted(),
+                        self.robot.setStatus(
+                            "All the tasks completed for today. See you tomorrow!"),
+                    ),
+                ),
+            ]),
         ])
 
+        self.behaviour_tree = py_trees.trees.BehaviourTree(
+            root=start_root
+        )
+        py_trees.display.render_dot_tree(start_root)
+        self.behaviour_tree.setup(timeout=15)
+
     def isWaitingAnswer(self):
-        return self.currentStep is not None and self.currentStep.activity == Activity.WAIT_ANSWER
+        return self.currentStep is not None and isinstance(self.currentStep, InteractionAction)
 
     def setAnswer(self, answer):
-        if self.currentStep is not None and self.currentStep.activity == Activity.WAIT_ANSWER:
+        if self.currentStep is not None and isinstance(self.currentStep, InteractionAction):
             self.currentStep.setAnswer(answer)
 
-    def currentActivity(self):
-        if self.currentStep is not None:
-            return self.currentStep.activity
-        return Activity.NONE
+    def processCompleted(self):
+        if self.behaviour_tree is not None:
+            self.behaviour_tree.interrupt(),
+            self.behaviour_tree.shutdown(),
+            self.behaviour_tree = None
 
     def process(self):
-        if self.steps:
-            if self.currentStep is None:
-                self.currentStep = self.steps.pop(0)
-
-                if self.currentStep.status is not None:
-                    self.robot.setStatus(self.currentStep.status)
-                else:
-                    self.robot.setStatus("")
-
-                # Compute the path from robot actual position to the target
-                if self.currentStep.target is not None:
-                    self.currentPath = self.compute_path(
-                        self.currentStep.target)
-
-            else:
-                if self.currentStep.activity != Activity.WAIT_ANSWER:
-                    if len(self.currentPath) > 0:
-                        p = self.currentPath.pop(0)
-                        if len(self.currentPath) > 0:
-                            self.currentPath.pop(0)
-                        return p
-                    else:
-                        self.currentStep.targetReached()
-
-                    # I've reached the point => I can execute the callback (if any)
-                    if self.currentStep.isTargetReached():
-                        if self.currentStep.onComplete is not None:
-                            self.currentStep.onComplete()
-                        self.currentStep = None
-                else:
-                    if self.currentStep.hasBeenAnswered():
-                        answer = self.currentStep.getAnswer()
-                        patient = self.currentStep.getPatient()
-                        if patient is not None:
-                            # TODO: prepend tasks to self.steps according user profile (use verificator and/or conditioner)
-                            if answer:
-                                # The patient said Yes
-                                self.robot.conversation = Constants.ANSWER_YES
-                                self.activity = Activity.PATIENT_GIVE_PILL
-                                self.planConditioners["pill_attempts"].reset()
-                                self.steps.insert(
-                                    0,
-                                    PlanStep(
-                                        patient.position,
-                                        Activity.PATIENT_GIVE_PILL,
-                                        "Entering into " + patient.name + "'s room",
-                                        patient=patient,
-                                        onComplete=lambda: (
-                                            self.robot.setConversation(""),
-                                        )
-                                    )
-                                )
-                            else:
-                                # The patient said No
-                                self.steps = [
-                                    s for s in self.steps if s.getPatient() != patient
-                                ]
-                                self.robot.conversation = Constants.ANSWER_NO
-                                
-                                patientHumorConfiguration = self.robot.configuration.get_properties().get_property()[0]
-                                
-                                patientHumor =  self.planConditioners["pill_attempts"].random(patientHumorConfiguration.from_, patientHumorConfiguration.to)
-                                Logger.i(f"Patient Humor Score: {patientHumor}")
-                                
-                                self.planConditioners["pill_attempts"].inc()
-                                Logger.i(f"Number of attempts: {self.planConditioners['pill_attempts'].status + 1}")
-                                if (self.planVerificators["patient_humor"].verify(["patient_humor_good", "patient_humor_bad"], patientHumor, self.planConditioners["pill_attempts"].status)):
-                                    self.steps.insert(
-                                        0,
-                                        PlanStep(None, Activity.WAIT_ANSWER, status = f"Attempt number {self.planConditioners['pill_attempts'].status + 1}. {patient.name}, can I enter?", patient=patient),
-                                    )
-                                else:
-                                    self.planConditioners["pill_attempts"].reset()
-                                    self.steps.insert(
-                                        0,
-                                        PlanStep(
-                                            self.robot.world.findPlayer(
-                                                "nurse").position,
-                                            Activity.CALL_NURSE_FOR_PATIENT,
-                                            "Call Nurse for " + patient.name,
-                                            onComplete=lambda: (
-                                                self.robot.setConversation(""),
-                                            )
-                                        )
-                                    )
-                                pass 
-
-                        if self.currentStep.onComplete is not None:
-                            self.currentStep.onComplete()
-                        self.currentStep = None
+        def print_tree(tree):
+            print(py_trees.display.unicode_tree(
+                root=tree.root, show_status=True))
+        if self.behaviour_tree is not None:
+            try:
+                self.behaviour_tree.tick(
+                    pre_tick_handler=None,
+                    post_tick_handler=print_tree
+                )
+                self.currentStep = self.behaviour_tree.tip()
+                if self.currentStep:
+                    status = self.currentStep.name
+                    if self.currentStep.parent:
+                        status = self.currentStep.parent.name + " > " + status
+                    self.robot.setStatus(status)
+            except:
+                pass
+            return self.currentStep
         return None
 
     def compute_path(self, target):
@@ -253,11 +242,12 @@ class Robot:
     def __init__(self, model, world, configuration=None):
         self.model = model
         self.world = world
-        
+
         if configuration:
             self.configuration = configuration
-            Logger.s(f"Configuration loaded for Robot with Id: {self.configuration.get_id()} ")
-        
+            Logger.s(
+                f"Configuration loaded for Robot with Id: {self.configuration.get_id()} ")
+
         self.reset()
 
     def reset(self):
@@ -273,11 +263,12 @@ class Robot:
     def setStatus(self, text):
         self.status = text
 
-    def setActivity(self, activity):
-        self.activity = activity
-
     def setPills(self, num):
         self.pills = num
+
+    def decreasePills(self):
+        if self.pills > 0:
+            self.pills -= 1
 
     def setStatus(self, text):
         self.status = text
@@ -292,14 +283,7 @@ class Robot:
         status_text.text = self.status
         conversation_text.text = self.conversation
 
-        p = self.planner.process()
-        if p is not None:
-            origin = self.model.world_position
-            ignore = [self.model]
-            # ignore.extend(self.world.players)
-            hit_info = raycast(origin, Vec3(p.x, p.y, 0), ignore=ignore, distance=1, debug=False)
-            if not hit_info.hit:
-                self.model.position = (p.x, p.y, 0)
+        self.planner.process()
 
     def isWaitingAnswer(self):
         return self.planner.isWaitingAnswer()
@@ -308,8 +292,4 @@ class Robot:
         self.planner.setAnswer(answer)
 
     def interactWith(self, model):
-        if self.planner.currentActivity() == Activity.PATIENT_GIVE_PILL:
-            self.pills -= 1
-            self.status = "Pills taken!, Pill delivered to " + model.name
-        else:
-            self.conversation = "Hi " + model.name + "!"
+        self.conversation = "Hi " + model.name + "!"
