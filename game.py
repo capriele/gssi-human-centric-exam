@@ -2,7 +2,7 @@ from ursina import *
 from configurer import Configurer
 from constants import Constants
 from logger import Logger
-from entities import Wall, Player, World, Robot
+from entities import *
 
 import threading
 import time
