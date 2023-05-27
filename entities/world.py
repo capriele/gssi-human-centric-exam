@@ -173,14 +173,13 @@ class World:
         # create all the rooms
         self.rooms = [
             Room(
-                "Medical Room",
-                Vec3(-8.66907, 10.0107, 0),
-                []
+                name="Medical Room",
+                door=Point(-8.66907, 10.0107),
             ),
             Room(
-                "Alice Room",
-                Vec3(9.51363, -7.97634, 0),
-                Polygon([
+                name="Alice Room",
+                door=Point(9.51363, -7.97634),
+                polygon=Polygon([
                     self.map2point(Point(93, 444)),
                     self.map2point(Point(93, 303)),
                     self.map2point(Point(293, 303)),
@@ -188,9 +187,9 @@ class World:
                 ]),
             ),
             Room(
-                "Bob Room",
-                Vec3(27.6749, -8.15384, 0),
-                Polygon([
+                name="Bob Room",
+                door=Point(27.6749, -8.15384),
+                polygon=Polygon([
                     self.map2point(Point(93, 593)),
                     self.map2point(Point(93, 453)),
                     self.map2point(Point(293, 453)),

@@ -3,6 +3,7 @@ import py_trees
 from shapely.geometry import Point
 import time
 import uuid
+from .planner import *
 
 from configurer import Configurer
 from constants import Constants
@@ -11,7 +12,7 @@ from logger import Logger
 
 class MovingAction(py_trees.behaviour.Behaviour):
 
-    def __init__(self, name: str, planner, target: Point, patient=None, onComplete=None):
+    def __init__(self, name: str, planner: Planner, target: Point, patient=None, onComplete=None):
         """Configure the name of the behaviour."""
         super(MovingAction, self).__init__(name)
         self.id = (
@@ -86,7 +87,7 @@ class ExecutionAction(py_trees.behaviour.Behaviour):
 
 class InteractionAction(py_trees.behaviour.Behaviour):
 
-    def __init__(self, name: str, planner=None, patient=None, onComplete=None):
+    def __init__(self, name: str, planner: Planner = None, patient=None, onComplete=None):
         """Configure the name of the behaviour."""
         super(InteractionAction, self).__init__(name)
         self.id = (
