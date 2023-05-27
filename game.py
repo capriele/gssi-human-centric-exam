@@ -78,12 +78,6 @@ Text("Bob Room", color=color.azure, position=(-0.6, 0.38, 0), scale=0.7)
 status_text = Text("", color=color.green, scale=1, x=-0.6, y=-0.36, z=0)
 conversation_text = Text("", color=color.red, scale=1, x=-0.6, y=-0.4, z=0)
 
-"""
-camera.position = (-40, -230, 200)
-camera.rotation_y = 170
-camera.rotation_x = -50
-camera.rotation_z = 0
-"""
 cp = Vec3(0, 0, 100)
 camera.position = cp
 camera.rotation_y = 180
@@ -91,43 +85,10 @@ camera.rotation_x = 0
 camera.rotation_z = 0
 # camera.look_at(robot)
 
-# this part will make the player move left or right based on our input.
-# to check which keys are held down, we can check the held_keys dictionary.
-# 0 means not pressed and 1 means pressed.
-# time.dt is simply the time since the last frame. by multiplying with this, the
-# player will move at the same speed regardless of how fast the game runs.
-
 
 def input(key):
     if key == "escape":
         quit()
-    elif key == "space":
-        robot.y += 1
-        invoke(setattr, robot, "y", robot.y - 1, delay=0.25)
-    elif key == "left mouse up":
-        ox = -0.199021 - 0.3375785168685913 + 0.6643332242965698 / 2
-        oy = 0.109775 + 0.16665083847045897 - 0.32824939489364624 / 2
-        mx = 2 * (mouse.position.x - ox) / (-0.6643332242965698)
-        my = 2 * (mouse.position.y - oy) / (0.32824939489364624)
-        print(Vec3(30 * mx, 15 * my, 0))
-    """
-    elif key == 'scroll up':
-        cp[0] += 0
-        cp[1] += 0
-        cp[2] += 0
-        camera.position = cp
-        camera.rotation_x += 1
-        camera.rotation_y += 1
-        camera.rotation_z += 0
-    elif key == 'scroll down':
-        cp[0] -= 0
-        cp[1] -= 0
-        cp[2] -= 0
-        camera.position = cp
-        camera.rotation_x -= 1
-        camera.rotation_y -= 1
-        camera.rotation_z -= 0
-    """
 
 
 pressed_key = None
