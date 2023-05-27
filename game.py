@@ -39,7 +39,8 @@ class Player(Entity):
         self.is_human = is_human
         self.is_staff = is_staff
         self.base_color = self.color
-        self.collider = BoxCollider(self, center=Vec3(0, 0, 0), size=Vec3(2, 2, 2))
+        self.collider = BoxCollider(
+            self, center=Vec3(0, 0, 0), size=Vec3(2, 2, 2))
         self.path = []
         self.goal = None
         self.room = None
@@ -155,7 +156,7 @@ bob = Player(
     is_human=True,
     color=color.azure,
     position=Vec3(23, 10, 0),
-    scale=3,
+    scale=2,
 )
 alice = Player(
     model="cube",
@@ -164,7 +165,7 @@ alice = Player(
     is_human=True,
     color=color.pink,
     position=Vec3(6, 10, 0),
-    scale=3,
+    scale=2,
 )
 
 
@@ -187,18 +188,22 @@ nurse = Player(
     is_staff=True,
     color=color.white,
     position=Vec3(-23, -10, 0),
-    scale=3,
+    scale=2,
 )
 
 
-Wall(scale_x=100 * scale, scale_y=1, scale_z=1, x=-50 * scale, y=-50 * scale, z=0)
+Wall(scale_x=100 * scale, scale_y=1, scale_z=1,
+     x=-50 * scale, y=-50 * scale, z=0)
 Wall(scale_x=100 * scale, scale_y=1, scale_z=1, x=50 * scale, y=-50 * scale, z=0)
 Wall(scale_x=1, scale_y=50 * scale, scale_z=1, x=100 * scale, y=25 * scale, z=0)
-Wall(scale_x=1, scale_y=50 * scale, scale_z=1, x=100 * scale, y=-25 * scale, z=0)
+Wall(scale_x=1, scale_y=50 * scale, scale_z=1,
+     x=100 * scale, y=-25 * scale, z=0)
 Wall(scale_x=100 * scale, scale_y=1, scale_z=1, x=-50 * scale, y=50 * scale, z=0)
 Wall(scale_x=100 * scale, scale_y=1, scale_z=1, x=50 * scale, y=50 * scale, z=0)
-Wall(scale_x=1, scale_y=50 * scale, scale_z=1, x=-100 * scale, y=25 * scale, z=0)
-Wall(scale_x=1, scale_y=50 * scale, scale_z=1, x=-100 * scale, y=-25 * scale, z=0)
+Wall(scale_x=1, scale_y=50 * scale, scale_z=1,
+     x=-100 * scale, y=25 * scale, z=0)
+Wall(scale_x=1, scale_y=50 * scale, scale_z=1,
+     x=-100 * scale, y=-25 * scale, z=0)
 Wall(scale_x=1, scale_y=70 * scale, scale_z=1, x=-50 * scale, y=15 * scale, z=0)
 Wall(scale_x=1, scale_y=70 * scale, scale_z=1, x=0 * scale, y=15 * scale, z=0)
 Wall(scale_x=1, scale_y=70 * scale, scale_z=1, x=50 * scale, y=15 * scale, z=0)
@@ -275,27 +280,32 @@ def input(key):
 
 pressed_key = None
 
+
 def unset_pressed_key(seconds):
     global pressed_key
     time.sleep(seconds)
     Logger.i("Keys re-enabled...")
     pressed_key = None
-    
+
+
 def disable_held_keys(key):
     global pressed_key
-    Logger.i(f"Disabling keys for {Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS} seconds...")
+    Logger.i(
+        f"Disabling keys for {Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS} seconds...")
     lock = threading.Lock()
     lock.acquire()
     pressed_key = key
-    thread = threading.Thread(target=unset_pressed_key, args=[Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS])
+    thread = threading.Thread(target=unset_pressed_key, args=[
+                              Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS])
     thread.start()
     lock.release()
-    
+
+
 def update():
     global pressed_key
-        
+
     if pressed_key == None:
-        
+
         if held_keys[Constants.KEY_RESET]:
             Logger.i(f"Pressed key {held_keys[Constants.KEY_RESET]}...")
             disable_held_keys(Constants.KEY_RESET)
@@ -313,7 +323,7 @@ def update():
                 Logger.i(f"Pressed key {held_keys[Constants.KEY_NO]}...")
                 disable_held_keys(Constants.KEY_NO)
                 robotClass.setAnswer(False)
-    
+
     robotClass.update(
         dt=time.dt, status_text=status_text, conversation_text=conversation_text
     )
