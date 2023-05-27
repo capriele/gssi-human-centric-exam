@@ -8,8 +8,8 @@
     <hospital>
         <rooms>
             <room>
-                <id>1</id>
-                <name>Room 1</name>
+                <id>0</id>
+                <name>Bob Room</name>
                 <patients>
                     <patient>
                         <name>Bob</name>
@@ -21,12 +21,36 @@
             </room>
             <room>
                 <id>1</id>
-                <name>Room 2</name>
+                <name>Alice Room</name>
                 <patients>
                     <patient>
                         <name>Alice</name>
                         <color>#AA336A</color>
                         <position_x>6</position_x>
+                        <position_y>10</position_y>
+                    </patient>
+                </patients>
+            </room>
+            <room>
+                <id>2</id>
+                <name>Medical Room</name>
+                <patients>
+                    <patient>
+                        <name>Fake</name>
+                        <color>#0096FF</color>
+                        <position_x>23</position_x>
+                        <position_y>10</position_y>
+                    </patient>
+                </patients>
+            </room>
+            <room>
+                <id>3</id>
+                <name>Living Room</name>
+                <patients>
+                    <patient>
+                        <name>Fake</name>
+                        <color>#0096FF</color>
+                        <position_x>23</position_x>
                         <position_y>10</position_y>
                     </patient>
                 </patients>

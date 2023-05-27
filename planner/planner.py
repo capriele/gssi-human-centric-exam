@@ -39,12 +39,22 @@ class Planner:
                     planner=self,
                     target=self.medical_room.door
                 ),
+                a.MovingAction(
+                    name="Moving to Medical Room",
+                    planner=self,
+                    target=self.medical_room.center
+                ),
                 a.ExecutionAction(
                     name="Take Pills",
                     onComplete=lambda: (
                         print("Pills Taken"),
                         self.robot.setPills(self.robot.world.patientsCount()),
                     ),
+                ),
+                a.MovingAction(
+                    name="Exiting from Medical Room",
+                    planner=self,
+                    target=self.medical_room.door
                 ),
                 a.MovingAction(
                     name="Going back to base",

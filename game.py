@@ -6,21 +6,173 @@ from entities import *
 
 import threading
 import time
+import matplotlib.pyplot as plt
 
-app = Ursina(size=(600, 600))
 
-scale = 0.3
+class WorldCreator:
+    def __init__(self, configuration, roomSize=(150, 200), doorSize=65, wallTickness=1, scale=0.1):
+        rooms_name = []
+        for r in configuration.get_hospital().get_rooms().get_room():
+            rooms_name.append(r.get_name())
+
+        roomsCount = len(rooms_name)
+        self.scale = scale
+        self.map = np.zeros((roomSize[0]*roomsCount, roomSize[1]+100))
+        mapSize = self.map.shape
+        self.map[0:wallTickness, :] = 1
+        self.map[mapSize[0]-wallTickness:mapSize[0], :] = 1
+        self.map[:, 0:wallTickness] = 1
+        self.map[:, mapSize[1]-wallTickness:mapSize[1]] = 1
+
+        x1 = 0 + wallTickness
+        y1 = 0 + wallTickness
+        x2 = mapSize[0] - wallTickness
+        y2 = mapSize[1] - roomSize[1] - wallTickness
+        x1 = (x1-self.map.shape[0]/2)*self.scale
+        x2 = (x2-self.map.shape[0]/2)*self.scale
+        y1 = (y1-self.map.shape[1]/2)*self.scale
+        y2 = (y2-self.map.shape[1]/2)*self.scale
+        corridor_polygon = Polygon([
+            (x1, y1),
+            (x1, y2),
+            (x2, y2),
+            (x2, y1),
+        ])
+
+        corridor = Room(
+            name="Corridor",
+            door=Point(0, 0),
+            door_polygon=None,
+            polygon=corridor_polygon,
+        )
+
+        self.rooms = []
+
+        for i in range(0, roomsCount):
+            # Vertical
+            self.map[i*roomSize[0]:i*roomSize[0]+wallTickness,
+                     mapSize[1]-roomSize[1]:mapSize[1]] = 1
+
+            # Horizontal
+            self.map[i*roomSize[0]:(i+1)*roomSize[0]-doorSize, mapSize[1] -
+                     roomSize[1]:mapSize[1]-roomSize[1]+wallTickness] = 1
+
+            x1 = i*roomSize[0] + wallTickness
+            y1 = mapSize[1]-roomSize[1] + wallTickness
+            x2 = (i+1)*roomSize[0] - wallTickness
+            y2 = mapSize[1] - wallTickness
+            x1 = -(x1-self.map.shape[0]/2)*self.scale
+            x2 = -(x2-self.map.shape[0]/2)*self.scale
+            y1 = (y1-self.map.shape[1]/2)*self.scale
+            y2 = (y2-self.map.shape[1]/2)*self.scale
+            room_polygon = Polygon([
+                (x1, y1),
+                (x1, y2),
+                (x2, y2),
+                (x2, y1),
+            ])
+
+            x1 = (i)*roomSize[0]-doorSize + wallTickness
+            y1 = mapSize[1]-roomSize[1] - wallTickness - 10
+            x2 = (i+1)*roomSize[0] - wallTickness
+            y2 = mapSize[1]-roomSize[1] + wallTickness + 5
+            x1 = -(x1-self.map.shape[0]/2)*self.scale
+            x2 = -(x2-self.map.shape[0]/2)*self.scale
+            y1 = (y1-self.map.shape[1]/2)*self.scale
+            y2 = (y2-self.map.shape[1]/2)*self.scale
+            door_polygon = Polygon([
+                (x1, y1),
+                (x1, y2),
+                (x2, y2),
+                (x2, y1),
+            ])
+            door = door_polygon.centroid
+
+            self.rooms.append(
+                Room(
+                    name=rooms_name[i],
+                    door=door,
+                    door_polygon=door_polygon,
+                    polygon=room_polygon,
+                )
+            )
+            colors = [
+                color.blue, color.red, color.yellow, color.green
+            ]
+            '''
+            Player(
+                model="cube",
+                collider="sphere",
+                name="test",
+                is_human=False,
+                color=colors[i],
+                position=Vec3(room_polygon.centroid.x,
+                              room_polygon.centroid.y, 0),
+                scale=2,
+            )
+            Player(
+                model="cube",
+                collider="sphere",
+                name="test",
+                is_human=False,
+                color=colors[i],
+                position=Vec3(door.x, door.y, 0),
+                scale=2,
+            )
+            plt.plot(*room_polygon.exterior.xy)
+            plt.plot(*door_polygon.exterior.xy)
+            plt.plot(door.x, door.y, marker="o", markersize=5,
+                     markeredgecolor="red", markerfacecolor="red")
+            plt.plot(room_polygon.centroid.x, room_polygon.centroid.y, marker="o", markersize=5,
+                     markeredgecolor="green", markerfacecolor="green")
+            '''
+
+        # plt.show()
+        # self.room.insert(len(self.room)-1)
+
+        # route_space_polygon = unary_union(
+        #    [corridor_polygon, door_polygon, room_polygon])
+
+    def create_map(self):
+        for iy, ix in np.ndindex(self.map.shape):
+            val = self.map[iy, ix]
+            if val == 1:
+                Wall(
+                    scale=(1*self.scale, 1*self.scale, 10*self.scale),
+                    position=((iy-self.map.shape[0]/2)*self.scale,
+                              (ix-self.map.shape[1]/2)*self.scale, 0)
+                )
+
+    def __str__(self) -> str:
+        s = ""
+        for r in self.rooms:
+            s += str(r) + "\r\n"
+        return s
+
 
 configuration = Configurer().load_base_configuration()
+patients = []
 for r in configuration.get_hospital().get_rooms().get_room():
-    patient = r.get_patients().get_patient()
+    p = r.get_patients().get_patient()
+    if p.get_name().lower() != "fake":
+        patients.append(p)
+
+scale = 0.1
+wc = WorldCreator(
+    configuration=configuration,
+    scale=scale,
+)
+app = Ursina(size=(wc.map.shape[0], wc.map.shape[1]*2))
+wc.create_map()
+for index, patient in enumerate(patients):
+    room = wc.rooms[index]
     Player(
         model="cube",
         collider="sphere",
         name=patient.get_name(),
         is_human=True,
         color=color.hex(patient.get_color()),
-        position=Vec3(patient.get_position_x(), patient.get_position_y(), 0),
+        position=Vec3(room.center.x, room.center.y, 0),
         scale=2,
     )
 
@@ -44,36 +196,14 @@ nurse = Player(
     scale=2,
 )
 
-
-Wall(scale_x=100 * scale, scale_y=1, scale_z=1,
-     x=-50 * scale, y=-50 * scale, z=0)
-Wall(scale_x=100 * scale, scale_y=1, scale_z=1, x=50 * scale, y=-50 * scale, z=0)
-Wall(scale_x=1, scale_y=50 * scale, scale_z=1, x=100 * scale, y=25 * scale, z=0)
-Wall(scale_x=1, scale_y=50 * scale, scale_z=1,
-     x=100 * scale, y=-25 * scale, z=0)
-Wall(scale_x=100 * scale, scale_y=1, scale_z=1, x=-50 * scale, y=50 * scale, z=0)
-Wall(scale_x=100 * scale, scale_y=1, scale_z=1, x=50 * scale, y=50 * scale, z=0)
-Wall(scale_x=1, scale_y=50 * scale, scale_z=1,
-     x=-100 * scale, y=25 * scale, z=0)
-Wall(scale_x=1, scale_y=50 * scale, scale_z=1,
-     x=-100 * scale, y=-25 * scale, z=0)
-Wall(scale_x=1, scale_y=70 * scale, scale_z=1, x=-50 * scale, y=15 * scale, z=0)
-Wall(scale_x=1, scale_y=70 * scale, scale_z=1, x=0 * scale, y=15 * scale, z=0)
-Wall(scale_x=1, scale_y=70 * scale, scale_z=1, x=50 * scale, y=15 * scale, z=0)
-Wall(scale=(45 * scale, 1, 1), position=(60 * scale, -20 * scale, 0))
-Wall(scale=(45 * scale, 1, 1), position=(0 * scale, -20 * scale, 0))
-Wall(scale=(45 * scale, 1, 1), position=(-60 * scale, -20 * scale, 0))
-world = World(Player.entities, Wall.entities, step=0.1, create_map=True)
+world = World(Player.entities, Wall.entities, step=0.1, world_creator=wc)
 for p in Player.entities:
     p.setWorld(world)
 robotClass = Robot(robot, world, configuration)
 
 Text("Living Room", color=color.green, position=(0.46, 0.38, 0), scale=0.7)
-
 Text("Medical Room", color=color.white, position=(0.09, 0.38, 0), scale=0.7)
-
 Text("Alice Room", color=color.pink, position=(-0.2, 0.38, 0), scale=0.7)
-
 Text("Bob Room", color=color.azure, position=(-0.6, 0.38, 0), scale=0.7)
 status_text = Text("", color=color.green, scale=1, x=-0.6, y=-0.36, z=0)
 conversation_text = Text("", color=color.red, scale=1, x=-0.6, y=-0.4, z=0)

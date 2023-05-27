@@ -37,9 +37,9 @@ class MovingAction(py_trees.behaviour.Behaviour):
         if self.status != py_trees.common.Status.SUCCESS:
             if self.path:
                 p = self.path.pop(0)
-                if len(self.path) > 0:
-                    self.path.pop(0)
-
+                for i in range(0, 5):
+                    if len(self.path) > 0:
+                        self.path.pop(0)
                 if p is not None:
                     origin = self.planner.robot.model.world_position
                     ignore = [self.planner.robot.model]
