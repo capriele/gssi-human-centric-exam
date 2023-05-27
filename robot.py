@@ -193,7 +193,10 @@ class Planner:
         self.behaviour_tree = py_trees.trees.BehaviourTree(
             root=start_root
         )
-        py_trees.display.render_dot_tree(start_root)
+        py_trees.display.render_dot_tree(
+            start_root,
+            target_directory="./images",
+        )
         self.behaviour_tree.setup(timeout=15)
 
     def isWaitingAnswer(self):
@@ -221,7 +224,10 @@ class Planner:
                 )
                 self.currentStep = self.behaviour_tree.tip()
                 if self.currentStep:
-                    status = self.currentStep.name
+                    try:
+                        status = self.currentStep.getStatus()
+                    except:
+                        status = self.currentStep.name
                     if self.currentStep.parent:
                         status = self.currentStep.parent.name + " > " + status
                     self.robot.setStatus(status)

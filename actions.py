@@ -1,25 +1,12 @@
-"""
-Navigation behaviors for TurtleBot3.
-
-# Open XQuartz
-open -a XQuartz
-
-xhost + 127.0.0.1
-export DISPLAY=host.docker.internal:0
-DISPLAY=host.docker.internal:0 docker compose up demo-world
-
-export DISPLAY=host.docker.internal:0
-DISPLAY=host.docker.internal:0 docker compose up demo-behavior-py
-
--e DISPLAY=host.docker.internal:0 -v /tmp/.X11-unix:/tmp/.X11-unix 
-jess/firefox
-"""
-
 from ursina import *
 import py_trees
 from shapely.geometry import Point
 import time
 import uuid
+
+from configurer import Configurer
+from constants import Constants
+from logger import Logger
 
 
 class MovingAction(py_trees.behaviour.Behaviour):
@@ -79,22 +66,21 @@ class ExecutionAction(py_trees.behaviour.Behaviour):
         )
         self.status = py_trees.common.Status.RUNNING
         self.onComplete = onComplete
-
-    def setup(self, **kwargs: int) -> None:
-        pass
+        self.startTime = time.time()
 
     def initialise(self) -> None:
-        pass
+        self.startTime = time.time()
 
     def update(self) -> py_trees.common.Status:
         """Increment the counter, monitor and decide on a new status."""
         new_status = py_trees.common.Status.RUNNING
         if self.status != py_trees.common.Status.SUCCESS:
-            if self.onComplete is not None:
-                self.onComplete()
-                new_status = py_trees.common.Status.SUCCESS
-            else:
-                new_status = py_trees.common.Status.FAILURE
+            if (time.time() - self.startTime) > Constants.ROBOT_EXECUTION_ACTION_DT:
+                if self.onComplete is not None:
+                    self.onComplete()
+                    new_status = py_trees.common.Status.SUCCESS
+                else:
+                    new_status = py_trees.common.Status.FAILURE
         return new_status
 
 
@@ -110,7 +96,12 @@ class InteractionAction(py_trees.behaviour.Behaviour):
         self.patient = patient
         self.onComplete = onComplete
         self._answer = None
-        self.blackboard = planner.blackboard
+        self.planner = planner
+        self.blackboard = self.planner.blackboard
+        self.startTime = time.time()
+
+    def initialise(self) -> None:
+        self.startTime = time.time()
 
     def setAnswer(self, answer):
         self._answer = answer
@@ -118,16 +109,55 @@ class InteractionAction(py_trees.behaviour.Behaviour):
     def getAnswer(self):
         return self._answer
 
+    def getStatus(self):
+        tentative = self.planner.planConditioners['pill_attempts'].status + 1
+        status = self.name + " [Tentative: " + str(tentative) + "]"
+        return status
+
     def update(self) -> py_trees.common.Status:
         """Increment the counter, monitor and decide on a new status."""
+
         new_status = py_trees.common.Status.RUNNING
         if self.status != py_trees.common.Status.SUCCESS:
-            if self._answer is not None:
-                new_status = py_trees.common.Status.SUCCESS
+            if self._answer is not None and (time.time() - self.startTime) > Constants.TIMEOUT_IN_SECONDS_TO_PATIENT_INTERACTION:
+                self.startTime = time.time()
 
-                if self.blackboard is not None:
+                if self._answer:
+                    # The patient said Yes
+                    new_status = py_trees.common.Status.SUCCESS
+                    self.planner.robot.conversation = Constants.ANSWER_YES
+                    self.planner.planConditioners["pill_attempts"].reset()
+                    if self.blackboard is not None:
+                        self.blackboard.set(
+                            self.patient.name.lower()+"_can_enter",
+                            self._answer
+                        )
+                else:
+                    # The patient said No
+                    self.planner.robot.conversation = Constants.ANSWER_NO
+                    patientHumorConfiguration = self.planner.robot.configuration.get_properties().get_property()[
+                        0]
+                    patientHumor = self.planner.planConditioners["pill_attempts"].random(
+                        patientHumorConfiguration.from_, patientHumorConfiguration.to)
+                    Logger.i(f"Patient Humor Score: {patientHumor}")
+
+                    self.planner.planConditioners["pill_attempts"].inc()
                     self.blackboard.set(
-                        self.patient.name.lower()+"_can_enter", self._answer)
+                        self.patient.name.lower()+"_pill_attempts",
+                        self.planner.planConditioners['pill_attempts'].status + 1
+                    )
+                    Logger.i(
+                        f"Number of attempts: {self.planner.planConditioners['pill_attempts'].status + 1}")
+                    if self.planner.planVerificators["patient_humor"].verify(["patient_humor_good", "patient_humor_bad"], patientHumor, self.planner.planConditioners["pill_attempts"].status):
+                        pass
+                    else:
+                        new_status = py_trees.common.Status.SUCCESS
+                        self.planner.planConditioners["pill_attempts"].reset()
+                        if self.blackboard is not None:
+                            self.blackboard.set(
+                                self.patient.name.lower()+"_can_enter",
+                                self._answer
+                            )
 
                 if self.onComplete is not None:
                     self.onComplete()

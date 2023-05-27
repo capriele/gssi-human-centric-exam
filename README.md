@@ -21,6 +21,9 @@ To re-generate `configuration.py` after a change of `schema_configuration.xsd`:
 python $PATH$/generateDS.py -o configuration.py configuration/schema_configuration.xsd
 ```
 
+## Robot daily job
+![Robot daily job](./images/daily_jobs.png)
+
 ## Useful links:
 - [Ursina](https://www.ursinaengine.org/)
 - [Robotics Toolbox Python](https://petercorke.github.io/robotics-toolbox-python)
