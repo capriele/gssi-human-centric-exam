@@ -10,39 +10,26 @@ import time
 app = Ursina(size=(600, 600))
 
 scale = 0.3
-"""
-bob = Player(model='models/Man.obj', collider='box',
-             scale=0.0065, position=Vec3(5, 5, 0))
-alice = Player(model='models/Woman.obj', collider='box',
-               scale=0.0065, position=Vec3(50, 5, 0))
-"""
-bob = Player(
-    model="cube",
-    collider="sphere",
-    name="Bob",
-    is_human=True,
-    color=color.azure,
-    position=Vec3(23, 10, 0),
-    scale=2,
-)
-alice = Player(
-    model="cube",
-    collider="sphere",
-    name="Alice",
-    is_human=True,
-    color=color.pink,
-    position=Vec3(6, 10, 0),
-    scale=2,
-)
 
+configuration = Configurer().load_base_configuration()
+for r in configuration.get_hospital().get_rooms().get_room():
+    patient = r.get_patients().get_patient()
+    Player(
+        model="cube",
+        collider="sphere",
+        name=patient.get_name(),
+        is_human=True,
+        color=color.hex(patient.get_color()),
+        position=Vec3(patient.get_position_x(), patient.get_position_y(), 0),
+        scale=2,
+    )
 
-robot_configuration = Configurer().load_base_configuration()
 robot = Player(
     model="cube",
     collider="sphere",
-    name=robot_configuration.get_name(),
+    name=configuration.get_name(),
     is_human=False,
-    color=color.hex(robot_configuration.get_color()),
+    color=color.hex(configuration.get_color()),
     position=Vec3(-8.66907, -10.6577, 0),
 )
 
@@ -77,10 +64,9 @@ Wall(scale=(45 * scale, 1, 1), position=(60 * scale, -20 * scale, 0))
 Wall(scale=(45 * scale, 1, 1), position=(0 * scale, -20 * scale, 0))
 Wall(scale=(45 * scale, 1, 1), position=(-60 * scale, -20 * scale, 0))
 world = World(Player.entities, Wall.entities, step=0.1, create_map=True)
-bob.setWorld(world)
-alice.setWorld(world)
-nurse.setWorld(world)
-robotClass = Robot(robot, world, robot_configuration)
+for p in Player.entities:
+    p.setWorld(world)
+robotClass = Robot(robot, world, configuration)
 
 Text("Living Room", color=color.green, position=(0.46, 0.38, 0), scale=0.7)
 

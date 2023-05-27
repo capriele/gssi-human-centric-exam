@@ -25,6 +25,9 @@
                                   <xs:complexType>
                                     <xs:sequence>
                                       <xs:element type="xs:string" name="name"/>
+                                      <xs:element type="xs:string" name="color"/>
+                                      <xs:element type="xs:int" name="position_x"/>
+                                      <xs:element type="xs:int" name="position_y"/>
                                     </xs:sequence>
                                   </xs:complexType>
                                 </xs:element>
