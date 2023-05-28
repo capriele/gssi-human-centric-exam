@@ -18,6 +18,7 @@
                         <xs:sequence>
                           <xs:element type="xs:int" name="id"/>
                           <xs:element type="xs:string" name="name"/>
+                          <xs:element type="xs:string" name="color"/>
                           <xs:element name="patients">
                             <xs:complexType>
                               <xs:sequence>

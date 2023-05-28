@@ -69,7 +69,8 @@ class Player(Entity):
         elif self.name == "Bob":
             self.area = self.world.bobMovementPolygon()
         else:
-            self.room = self.initialPosition
+            if self.is_staff:
+                self.room = self.initialPosition
 
     def update(self):
         if self.is_human:

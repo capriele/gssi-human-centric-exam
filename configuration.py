@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Sat May 27 16:51:33 2023 by generateDS.py version 2.12a.
+# Generated Sun May 28 11:14:34 2023 by generateDS.py version 2.12a.
 #
 
 import sys
@@ -948,9 +948,10 @@ class roomsType(GeneratedsSuper):
 class roomType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, id=None, name=None, patients=None):
+    def __init__(self, id=None, name=None, color=None, patients=None):
         self.id = id
         self.name = name
+        self.color = color
         self.patients = patients
     def factory(*args_, **kwargs_):
         if roomType.subclass:
@@ -962,12 +963,15 @@ class roomType(GeneratedsSuper):
     def set_id(self, id): self.id = id
     def get_name(self): return self.name
     def set_name(self, name): self.name = name
+    def get_color(self): return self.color
+    def set_color(self, color): self.color = color
     def get_patients(self): return self.patients
     def set_patients(self, patients): self.patients = patients
     def hasContent_(self):
         if (
             self.id is not None or
             self.name is not None or
+            self.color is not None or
             self.patients is not None
         ):
             return True
@@ -1002,6 +1006,9 @@ class roomType(GeneratedsSuper):
         if self.name is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sname>%s</%sname>%s' % (namespace_, self.gds_format_string(quote_xml(self.name), input_name='name'), namespace_, eol_))
+        if self.color is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scolor>%s</%scolor>%s' % (namespace_, self.gds_format_string(quote_xml(self.color), input_name='color'), namespace_, eol_))
         if self.patients is not None:
             self.patients.export(outfile, level, namespace_, name_='patients', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='roomType'):
@@ -1019,6 +1026,9 @@ class roomType(GeneratedsSuper):
         if self.name is not None:
             showIndent(outfile, level)
             outfile.write('name=%s,\n' % quote_python(self.name))
+        if self.color is not None:
+            showIndent(outfile, level)
+            outfile.write('color=%s,\n' % quote_python(self.color))
         if self.patients is not None:
             showIndent(outfile, level)
             outfile.write('patients=model_.patientsType(\n')
@@ -1047,6 +1057,10 @@ class roomType(GeneratedsSuper):
             name_ = child_.text
             name_ = self.gds_validate_string(name_, node, 'name')
             self.name = name_
+        elif nodeName_ == 'color':
+            color_ = child_.text
+            color_ = self.gds_validate_string(color_, node, 'color')
+            self.color = color_
         elif nodeName_ == 'patients':
             obj_ = patientsType.factory()
             obj_.build(child_)
