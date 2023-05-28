@@ -15,8 +15,6 @@
                     <patient>
                         <name>Tizio</name>
                         <color>#FF00FF</color>
-                        <position_x>23</position_x>
-                        <position_y>10</position_y>
                     </patient>
                 </patients>
             </room>
@@ -28,8 +26,6 @@
                     <patient>
                         <name>Bob</name>
                         <color>#0096FF</color>
-                        <position_x>23</position_x>
-                        <position_y>10</position_y>
                     </patient>
                 </patients>
             </room>
@@ -41,8 +37,6 @@
                     <patient>
                         <name>Alice</name>
                         <color>#AA336A</color>
-                        <position_x>6</position_x>
-                        <position_y>10</position_y>
                     </patient>
                 </patients>
             </room>
@@ -54,8 +48,6 @@
                     <patient>
                         <name>Fake</name>
                         <color>#0096FF</color>
-                        <position_x>23</position_x>
-                        <position_y>10</position_y>
                     </patient>
                 </patients>
             </room>
@@ -67,8 +59,6 @@
                     <patient>
                         <name>Fake</name>
                         <color>#0096FF</color>
-                        <position_x>23</position_x>
-                        <position_y>10</position_y>
                     </patient>
                 </patients>
             </room>
