@@ -1,10 +1,12 @@
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 from shapely.ops import unary_union
+from ursina import *
 
 
 class Room:
     rooms = []
+    rooms_name_entities = []
 
     def __init__(self, name: str, door: Point, polygon: Polygon = None, door_polygon: Polygon = None,  color: str = "#FFFFFF"):
         self.name = name
@@ -31,6 +33,23 @@ class Room:
         y_min = min(y)
         y_max = max(y)
         return x_min, x_max, y_min, y_max
+
+    @staticmethod
+    def write_rooms_name():
+        for t in Room.rooms_name_entities:
+            destroy(t)
+        for room in Room.rooms:
+            if room.name.lower() != "corridor":
+                point = world_position_to_screen_position(
+                    (room.center.x, room.center.y))
+                t = Text(
+                    room.name,
+                    color=color.hex(room.color),
+                    origin=(0, 0, 0),
+                    position=(point.x, 0.35, 0),
+                    scale=0.7
+                )
+                Room.rooms_name_entities.append(t)
 
     def width(self):
         x, y = self.polygon.minimum_rotated_rectangle.exterior.coords.xy
