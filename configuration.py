@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Sun May 28 11:14:34 2023 by generateDS.py version 2.12a.
+# Generated Sun May 28 17:11:36 2023 by generateDS.py version 2.12a.
 #
 
 import sys
@@ -1148,11 +1148,9 @@ class patientsType(GeneratedsSuper):
 class patientType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, name=None, color=None, position_x=None, position_y=None):
+    def __init__(self, name=None, color=None):
         self.name = name
         self.color = color
-        self.position_x = position_x
-        self.position_y = position_y
     def factory(*args_, **kwargs_):
         if patientType.subclass:
             return patientType.subclass(*args_, **kwargs_)
@@ -1163,16 +1161,10 @@ class patientType(GeneratedsSuper):
     def set_name(self, name): self.name = name
     def get_color(self): return self.color
     def set_color(self, color): self.color = color
-    def get_position_x(self): return self.position_x
-    def set_position_x(self, position_x): self.position_x = position_x
-    def get_position_y(self): return self.position_y
-    def set_position_y(self, position_y): self.position_y = position_y
     def hasContent_(self):
         if (
             self.name is not None or
-            self.color is not None or
-            self.position_x is not None or
-            self.position_y is not None
+            self.color is not None
         ):
             return True
         else:
@@ -1206,12 +1198,6 @@ class patientType(GeneratedsSuper):
         if self.color is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%scolor>%s</%scolor>%s' % (namespace_, self.gds_format_string(quote_xml(self.color), input_name='color'), namespace_, eol_))
-        if self.position_x is not None:
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sposition_x>%s</%sposition_x>%s' % (namespace_, self.gds_format_integer(self.position_x, input_name='position_x'), namespace_, eol_))
-        if self.position_y is not None:
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sposition_y>%s</%sposition_y>%s' % (namespace_, self.gds_format_integer(self.position_y, input_name='position_y'), namespace_, eol_))
     def exportLiteral(self, outfile, level, name_='patientType'):
         level += 1
         already_processed = set()
@@ -1227,12 +1213,6 @@ class patientType(GeneratedsSuper):
         if self.color is not None:
             showIndent(outfile, level)
             outfile.write('color=%s,\n' % quote_python(self.color))
-        if self.position_x is not None:
-            showIndent(outfile, level)
-            outfile.write('position_x=%d,\n' % self.position_x)
-        if self.position_y is not None:
-            showIndent(outfile, level)
-            outfile.write('position_y=%d,\n' % self.position_y)
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1251,22 +1231,6 @@ class patientType(GeneratedsSuper):
             color_ = child_.text
             color_ = self.gds_validate_string(color_, node, 'color')
             self.color = color_
-        elif nodeName_ == 'position_x':
-            sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError) as exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
-            ival_ = self.gds_validate_integer(ival_, node, 'position_x')
-            self.position_x = ival_
-        elif nodeName_ == 'position_y':
-            sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError) as exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
-            ival_ = self.gds_validate_integer(ival_, node, 'position_y')
-            self.position_y = ival_
 # end class patientType
 
 
