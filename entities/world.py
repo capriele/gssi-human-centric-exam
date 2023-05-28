@@ -10,6 +10,11 @@ from .room import *
 class World:
 
     def robotBaseCoords(self):
+        if self.world_creator is not None:
+            corridor = self.world_creator.corridor
+            if corridor:
+                length = corridor.length()
+                return Vec3(corridor.center.x - length/5.0, corridor.center.y, 0)
         return Vec3(-8.66907, -10.6577, 0)
 
     def findPlayer(self, name):
@@ -164,11 +169,9 @@ class World:
         self.players = players
         self.walls = walls
         self.step = step
-        self.x_min = -30.0
-        self.x_max = 30.0
-        self.y_min = -15.0
-        self.y_max = 15.0
+        self.x_min, self.x_max, self.y_min, self.y_max = Room.min_bounding_rectangle()
         self.use_distance_transform = use_distance_transform
+        self.world_creator = world_creator
 
         # create all the rooms
         if world_creator is not None:
@@ -230,12 +233,12 @@ class World:
             self.map[-1, :] = 1
             self.map[:, 0] = 1
             self.map[:, -1] = 1
-            scipy.io.savemat('./data/map.mat', {'map': self.map})
+            scipy.io.savemat('../data/map.mat', {'map': self.map})
         else:
             if world_creator is not None:
                 self.map = world_creator.map
             else:
-                house = scipy.io.loadmat("./data/map.mat")
+                house = scipy.io.loadmat("../data/map.mat")
                 self.map = house["map"]
 
         self.user_map = self.map.copy()
@@ -243,12 +246,13 @@ class World:
 
     def createPlanner(self):
         if self.use_distance_transform:
-            p = DistanceTransformPlanner(self.map.copy(), start=[
-                                         10, 10], goal=[11, 11])
-            p.plan()
-            return p
+            planner = DistanceTransformPlanner(self.map.copy(), start=[
+                10, 10], goal=[11, 11])
+            planner.plan()
         else:
-            return Bug2(occgrid=self.map.copy())
+            planner = Bug2(occgrid=self.map.copy())
+        # planner.plot(block=True)
+        return planner
 
     def createUserPlanner(self, player=None):
         tmp_map = self.user_map.copy()

@@ -13,7 +13,7 @@ class Wall(Entity):
         self.model = "cube"
         self.collider = "box"
         Wall.entities.append(self)
-        self.collider.visible = True
+        # self.collider.visible = True
 
     def polygon(self):
         start, end = self.getTightBounds()

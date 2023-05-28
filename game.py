@@ -10,14 +10,21 @@ import matplotlib.pyplot as plt
 
 
 class WorldCreator:
-    def __init__(self, configuration, roomSize=(150, 200), doorSize=65, wallTickness=1, scale=0.1):
+    def __init__(self, configuration, roomSize=(150, 200), doorSize=65, wallTickness=1, scale=0.1, resolution=1):
         rooms_name = []
+        rooms_color = []
         for r in configuration.get_hospital().get_rooms().get_room():
             rooms_name.append(r.get_name())
+            rooms_color.append(r.get_color())
+
+        roomSize = (int(roomSize[0]*resolution), int(roomSize[1]*resolution))
+        doorSize = int(doorSize*resolution)
 
         roomsCount = len(rooms_name)
         self.scale = scale
-        self.map = np.zeros((roomSize[0]*roomsCount, roomSize[1]+100))
+        self.map = np.zeros(
+            (int(roomSize[0]*roomsCount), int(roomSize[1]+100*resolution))
+        )
         mapSize = self.map.shape
         self.map[0:wallTickness, :] = 1
         self.map[mapSize[0]-wallTickness:mapSize[0], :] = 1
@@ -28,8 +35,8 @@ class WorldCreator:
         y1 = 0 + wallTickness
         x2 = mapSize[0] - wallTickness
         y2 = mapSize[1] - roomSize[1] - wallTickness
-        x1 = (x1-self.map.shape[0]/2)*self.scale
-        x2 = (x2-self.map.shape[0]/2)*self.scale
+        x1 = -(x1-self.map.shape[0]/2)*self.scale
+        x2 = -(x2-self.map.shape[0]/2)*self.scale
         y1 = (y1-self.map.shape[1]/2)*self.scale
         y2 = (y2-self.map.shape[1]/2)*self.scale
         corridor_polygon = Polygon([
@@ -39,7 +46,7 @@ class WorldCreator:
             (x2, y1),
         ])
 
-        corridor = Room(
+        self.corridor = Room(
             name="Corridor",
             door=Point(0, 0),
             door_polygon=None,
@@ -72,9 +79,9 @@ class WorldCreator:
                 (x2, y1),
             ])
 
-            x1 = (i)*roomSize[0]-doorSize + wallTickness
+            x1 = (i)*roomSize[0] + wallTickness
             y1 = mapSize[1]-roomSize[1] - wallTickness - 10
-            x2 = (i+1)*roomSize[0] - wallTickness
+            x2 = (i)*roomSize[0] + doorSize - wallTickness
             y2 = mapSize[1]-roomSize[1] + wallTickness + 5
             x1 = -(x1-self.map.shape[0]/2)*self.scale
             x2 = -(x2-self.map.shape[0]/2)*self.scale
@@ -94,44 +101,9 @@ class WorldCreator:
                     door=door,
                     door_polygon=door_polygon,
                     polygon=room_polygon,
+                    color=rooms_color[i]
                 )
             )
-            colors = [
-                color.blue, color.red, color.yellow, color.green
-            ]
-            '''
-            Player(
-                model="cube",
-                collider="sphere",
-                name="test",
-                is_human=False,
-                color=colors[i],
-                position=Vec3(room_polygon.centroid.x,
-                              room_polygon.centroid.y, 0),
-                scale=2,
-            )
-            Player(
-                model="cube",
-                collider="sphere",
-                name="test",
-                is_human=False,
-                color=colors[i],
-                position=Vec3(door.x, door.y, 0),
-                scale=2,
-            )
-            plt.plot(*room_polygon.exterior.xy)
-            plt.plot(*door_polygon.exterior.xy)
-            plt.plot(door.x, door.y, marker="o", markersize=5,
-                     markeredgecolor="red", markerfacecolor="red")
-            plt.plot(room_polygon.centroid.x, room_polygon.centroid.y, marker="o", markersize=5,
-                     markeredgecolor="green", markerfacecolor="green")
-            '''
-
-        # plt.show()
-        # self.room.insert(len(self.room)-1)
-
-        # route_space_polygon = unary_union(
-        #    [corridor_polygon, door_polygon, room_polygon])
 
     def create_map(self):
         for iy, ix in np.ndindex(self.map.shape):
@@ -176,13 +148,14 @@ for index, patient in enumerate(patients):
         scale=2,
     )
 
+length = wc.corridor.length()
 robot = Player(
     model="cube",
     collider="sphere",
     name=configuration.get_name(),
     is_human=False,
     color=color.hex(configuration.get_color()),
-    position=Vec3(-8.66907, -10.6577, 0),
+    position=Vec3(wc.corridor.center.x, wc.corridor.center.y, 0),
 )
 
 nurse = Player(
@@ -192,7 +165,7 @@ nurse = Player(
     is_human=True,
     is_staff=True,
     color=color.white,
-    position=Vec3(-23, -10, 0),
+    position=Vec3(wc.corridor.center.x - length/3.0, wc.corridor.center.y, 0),
     scale=2,
 )
 
@@ -201,14 +174,19 @@ for p in Player.entities:
     p.setWorld(world)
 robotClass = Robot(robot, world, configuration)
 
-Text("Living Room", color=color.green, position=(0.46, 0.38, 0), scale=0.7)
-Text("Medical Room", color=color.white, position=(0.09, 0.38, 0), scale=0.7)
-Text("Alice Room", color=color.pink, position=(-0.2, 0.38, 0), scale=0.7)
-Text("Bob Room", color=color.azure, position=(-0.6, 0.38, 0), scale=0.7)
+for room in wc.rooms:
+    Text(
+        room.name,
+        color=color.hex(room.color),
+        origin=(room.center.x/5.0, 0.1, 0),
+        position=(0, 0.35, 0),
+        scale=0.7
+    )
+
 status_text = Text("", color=color.green, scale=1, x=-0.6, y=-0.36, z=0)
 conversation_text = Text("", color=color.red, scale=1, x=-0.6, y=-0.4, z=0)
 
-cp = Vec3(0, 0, 100)
+cp = Vec3(0, 0, 110)
 camera.position = cp
 camera.rotation_y = 180
 camera.rotation_x = 0

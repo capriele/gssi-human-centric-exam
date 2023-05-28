@@ -40,7 +40,7 @@ class Planner:
                     target=self.medical_room.door
                 ),
                 a.MovingAction(
-                    name="Moving to Medical Room",
+                    name="Taking the Pills",
                     planner=self,
                     target=self.medical_room.center
                 ),
