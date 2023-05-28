@@ -6,7 +6,6 @@ from entities import *
 
 import threading
 import time
-import matplotlib.pyplot as plt
 
 
 class WorldCreator:
@@ -174,15 +173,6 @@ for p in Player.entities:
     p.setWorld(world)
 robotClass = Robot(robot, world, configuration)
 
-for room in wc.rooms:
-    Text(
-        room.name,
-        color=color.hex(room.color),
-        origin=(room.center.x/5.0, 0.1, 0),
-        position=(0, 0.35, 0),
-        scale=0.7
-    )
-
 status_text = Text("", color=color.green, scale=1, x=-0.6, y=-0.36, z=0)
 conversation_text = Text("", color=color.red, scale=1, x=-0.6, y=-0.4, z=0)
 
@@ -252,6 +242,8 @@ def update():
                 disable_held_keys(Constants.KEY_NO)
                 robotClass.setAnswer(False)
 
+    Room.write_rooms_name()
+
     robotClass.update(
         dt=time.dt, status_text=status_text, conversation_text=conversation_text
     )
@@ -266,16 +258,15 @@ def update():
                 p.color = p.base_color
 
 
-# Sky()
 Entity(
     model="plane", color=color.black, scale=200, rotation=(0, -90, 90)
-)  # , collider="box"
+)
 
 window.title = Constants.WINDOW_TITLE
 window.borderless = False
 window.fullscreen = False
-window.exit_button.visible = True
-window.fps_counter.enabled = True
+window.exit_button.visible = False
+window.fps_counter.enabled = False
 
 # start running the game
 app.run()

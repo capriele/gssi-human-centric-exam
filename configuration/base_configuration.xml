@@ -8,17 +8,6 @@
     <hospital>
         <rooms>
             <room>
-                <id>10</id>
-                <name>Tizio Room</name>
-                <color>#FF00FF</color>
-                <patients>
-                    <patient>
-                        <name>Tizio</name>
-                        <color>#FF00FF</color>
-                    </patient>
-                </patients>
-            </room>
-            <room>
                 <id>0</id>
                 <name>Bob Room</name>
                 <color>#0096FF</color>
