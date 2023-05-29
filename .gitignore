@@ -1,3 +1,7 @@
 __pycache__/
 generateDS/
 *.pyc
+
+.DS_Store
+images/*
+data/*
