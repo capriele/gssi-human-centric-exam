@@ -11,13 +11,21 @@ On MacOS
 pip install -r requirements_macos.txt
 ```
 
+## Launching
+
+To launch the software and ensure UTF-8 encoding is used for both input and output, you can run the following command:
+
+```bash
+python -X utf8 game.py
+```
+
 ## Generate configuration.py
 
 `configuration.py` is auto-generated with generateDS: https://github.com/ricksladkey/generateDS .
 
 To re-generate `configuration.py` after a change of `schema_configuration.xsd`:
 
-```python
+```bash
 python $PATH$/generateDS.py -o configuration.py configuration/schema_configuration.xsd
 ```
 
