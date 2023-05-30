@@ -163,10 +163,10 @@ class Planner:
         self.behaviour_tree = py_trees.trees.BehaviourTree(
             root=start_root
         )
-        py_trees.display.render_dot_tree(
+        """ py_trees.display.render_dot_tree(
             start_root,
             target_directory="./images",
-        )
+        ) """
         self.behaviour_tree.setup(timeout=15)
 
     def isWaitingAnswer(self):
@@ -190,7 +190,7 @@ class Planner:
             try:
                 self.behaviour_tree.tick(
                     pre_tick_handler=None,
-                    post_tick_handler=print_tree
+                    #post_tick_handler=print_tree
                 )
                 self.currentStep = self.behaviour_tree.tip()
                 if self.currentStep:

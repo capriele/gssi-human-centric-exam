@@ -208,11 +208,12 @@ def unset_pressed_key(seconds):
 
 def disable_held_keys(key):
     global pressed_key
+    pressed_key = key
+    held_keys[key] = 0
     Logger.i(
         f"Disabling keys for {Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS} seconds...")
     lock = threading.Lock()
     lock.acquire()
-    pressed_key = key
     thread = threading.Thread(target=unset_pressed_key, args=[
                               Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS])
     thread.start()
@@ -222,25 +223,23 @@ def disable_held_keys(key):
 def update():
     global pressed_key
 
-    if pressed_key == None:
-
-        if held_keys[Constants.KEY_RESET]:
-            Logger.i(f"Pressed key {held_keys[Constants.KEY_RESET]}...")
-            disable_held_keys(Constants.KEY_RESET)
-            robotClass.reset()
-        if held_keys[Constants.KEY_START]:
-            Logger.i(f"Pressed key {held_keys[Constants.KEY_START]}...")
-            disable_held_keys(Constants.KEY_START)
-            robotClass.startDailyActivities()
-        if robotClass.isWaitingAnswer():
-            if held_keys[Constants.KEY_YES]:
-                Logger.i(f"Pressed key {held_keys[Constants.KEY_YES]}...")
-                disable_held_keys(Constants.KEY_YES)
-                robotClass.setAnswer(True)
-            elif held_keys[Constants.KEY_NO]:
-                Logger.i(f"Pressed key {held_keys[Constants.KEY_NO]}...")
-                disable_held_keys(Constants.KEY_NO)
-                robotClass.setAnswer(False)
+    if held_keys[Constants.KEY_RESET] == 1:
+        Logger.i(f"Pressed key {held_keys[Constants.KEY_RESET]}...")
+        disable_held_keys(Constants.KEY_RESET)
+        robotClass.reset()
+    if held_keys[Constants.KEY_START] == 1:
+        Logger.i(f"Pressed key {held_keys[Constants.KEY_START]}...")
+        disable_held_keys(Constants.KEY_START)
+        robotClass.startDailyActivities()
+    if robotClass.isWaitingAnswer():
+        if held_keys[Constants.KEY_YES] == 1:
+            Logger.i(f"Pressed key {held_keys[Constants.KEY_YES]}...")
+            disable_held_keys(Constants.KEY_YES)
+            robotClass.setAnswer(True)
+        elif held_keys[Constants.KEY_NO] == 1:
+            Logger.i(f"Pressed key {held_keys[Constants.KEY_NO]}...")
+            disable_held_keys(Constants.KEY_NO)
+            robotClass.setAnswer(False)
 
     Room.write_rooms_name()
 

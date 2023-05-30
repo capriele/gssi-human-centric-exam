@@ -113,7 +113,7 @@ class InteractionAction(py_trees.behaviour.Behaviour):
 
     def getStatus(self):
         tentative = self.planner.planConditioners['pill_attempts'].status + 1
-        status = self.name + " [Tentative: " + str(tentative) + "]"
+        status = self.name + " [Attempt: " + str(tentative) + "]"
         return status
 
     def update(self) -> py_trees.common.Status:
@@ -199,7 +199,7 @@ if __name__ == '__main__':
     behaviour_tree = py_trees.trees.BehaviourTree(
         root=root
     )
-    py_trees.display.render_dot_tree(root)
+    #py_trees.display.render_dot_tree(root)
     behaviour_tree.setup(timeout=15)
 
     def print_tree(tree):
