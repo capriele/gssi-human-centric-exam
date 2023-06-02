@@ -8,7 +8,8 @@ class Room:
     rooms = []
     rooms_name_entities = []
 
-    def __init__(self, name: str, door: Point, polygon: Polygon = None, door_polygon: Polygon = None,  color: str = "#FFFFFF"):
+    def __init__(self, id: int, name: str, door: Point, polygon: Polygon = None, door_polygon: Polygon = None,  color: str = "#FFFFFF"):
+        self.id = id
         self.name = name
         self.color = color
         self.door = door

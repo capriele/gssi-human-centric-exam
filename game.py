@@ -7,11 +7,8 @@ from entities import *
 import threading
 import time
 
+import os
 import xmltodict
-alice_xml_data = open("configuration/alice.xml").read()
-bob_xml_data = open("configuration/bob.xml").read()
-alice_dict = xmltodict.parse(alice_xml_data)
-bob_dict = xmltodict.parse(bob_xml_data)
 
 
 class Action:
@@ -67,6 +64,8 @@ class PersonConfiguration:
     def __init__(self, dict):
         self.name = dict['person']['name']
         self.description = dict['person']['description']
+        self.room = int(dict['person']['room'])
+        self.color = dict['person']['color']
         self.authonomy = PersonConfiguration.fillRules(
             dict['person']['ethics'], 'autonomy')
         self.privacy = PersonConfiguration.fillRules(
@@ -116,15 +115,13 @@ class PersonConfiguration:
         return _list
 
 
-aliceConfiguration = PersonConfiguration(alice_dict)
-bobConfiguration = PersonConfiguration(bob_dict)
-
-
 class WorldCreator:
     def __init__(self, configuration, roomSize=(150, 200), doorSize=65, wallTickness=1, scale=0.1, resolution=1):
+        rooms_id = []
         rooms_name = []
         rooms_color = []
         for r in configuration.get_hospital().get_rooms().get_room():
+            rooms_id.append(r.get_id())
             rooms_name.append(r.get_name())
             rooms_color.append(r.get_color())
 
@@ -158,6 +155,7 @@ class WorldCreator:
         ])
 
         self.corridor = Room(
+            id=-1,
             name="Corridor",
             door=Point(0, 0),
             door_polygon=None,
@@ -208,6 +206,7 @@ class WorldCreator:
 
             self.rooms.append(
                 Room(
+                    id=rooms_id[i],
                     name=rooms_name[i],
                     door=door,
                     door_polygon=door_polygon,
@@ -234,12 +233,6 @@ class WorldCreator:
 
 
 configuration = Configurer().load_base_configuration()
-patients = []
-for r in configuration.get_hospital().get_rooms().get_room():
-    p = r.get_patients().get_patient()
-    if p.get_name().lower() != "fake":
-        patients.append(p)
-
 scale = 0.1
 wc = WorldCreator(
     configuration=configuration,
@@ -247,17 +240,31 @@ wc = WorldCreator(
 )
 app = Ursina(size=(wc.map.shape[0], wc.map.shape[1]*2))
 wc.create_map()
-for index, patient in enumerate(patients):
-    room = wc.rooms[index]
-    Player(
-        model="cube",
-        collider="sphere",
-        name=patient.get_name(),
-        is_human=True,
-        color=color.hex(patient.get_color()),
-        position=Vec3(room.center.x, room.center.y, 0),
-        scale=2,
+patients = []
+directory = 'patients'
+for filename in os.listdir(directory):
+    f = os.path.join(directory, filename)
+    if os.path.isfile(f):
+        file = open(f).read()
+        data = xmltodict.parse(file)
+        patient = PersonConfiguration(data)
+        patients.append(patient)
+for patient in patients:
+    room = next(
+        (room for room in wc.rooms if room.id == patient.room),
+        None
     )
+    if room is not None:
+        p = Player(
+            model="cube",
+            collider="sphere",
+            name=patient.name,
+            is_human=True,
+            color=color.hex(patient.color),
+            position=Vec3(room.center.x, room.center.y, 0),
+            scale=2,
+        )
+        p.setPatientConfiguration(patient)
 
 length = wc.corridor.length()
 robot = Player(

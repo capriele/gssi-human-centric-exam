@@ -8,6 +8,8 @@
   distribute to the nurse videos and audios that are strictly
   necessary for my health, and in any case videos cannot be recorded
   in the toilet."</description>
+  <room>0</room>
+  <color>#0096FF</color>
   <ethics>
     <autonomy>
       <rule name="accept-medication-reminder" value="true">

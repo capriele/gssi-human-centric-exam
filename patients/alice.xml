@@ -6,21 +6,23 @@
   video call; if she does not answer the robot should ask the
   intervention of a nurse and leave my room if I will be in my room of
   move away from me."</description>
+  <room>1</room>
+  <color>#AA336A</color>
   <ethics>
     <autonomy>
       <rule name="accept-health-status-check" value="true">
-		<exception name="patient_shows_signs_of_distress">
-			<action name="do_call_legal_guardian">
-				<exception name="legal_guardian_does_not_answer">
-					<action name="do_call_nurse" />
-					<action name="do_move_away" />
-				</exception>
-			</action>
-		</exception>
+        <exception name="patient_shows_signs_of_distress">
+          <action name="do_call_legal_guardian">
+            <exception name="legal_guardian_does_not_answer">
+              <action name="do_call_nurse" />
+              <action name="do_move_away" />
+            </exception>
+          </action>
+        </exception>
       </rule>
     </autonomy>
-	<dignity>
-		<rule name="accept-ambulatory-support" value="true" />
- 	</dignity>
+    <dignity>
+      <rule name="accept-ambulatory-support" value="true" />
+    </dignity>
   </ethics>
 </person>

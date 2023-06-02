@@ -29,6 +29,7 @@ class Player(Entity):
         self.room = None
         self.world = None
         self.planner = None
+        self.patientConfiguration = None
         self.initialPosition = self.position
         self.area = None
         self.lock = threading.Lock()
@@ -57,6 +58,9 @@ class Player(Entity):
                     self.path.extend(tmp_path)
                     self.lock.release()
             time.sleep(1.5)
+
+    def setPatientConfiguration(self, configuration):
+        self.patientConfiguration = configuration
 
     def setWorld(self, world):
         self.world = world
