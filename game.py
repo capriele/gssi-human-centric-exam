@@ -7,6 +7,118 @@ from entities import *
 import threading
 import time
 
+import xmltodict
+alice_xml_data = open("configuration/alice.xml").read()
+bob_xml_data = open("configuration/bob.xml").read()
+alice_dict = xmltodict.parse(alice_xml_data)
+bob_dict = xmltodict.parse(bob_xml_data)
+
+
+class Action:
+    def __init__(self, name, dict=None):
+        self.name = name
+        if dict and "exception" in dict:
+            if "action" in dict["exception"]:
+                _actions = dict["exception"]["action"]
+                actions = []
+                if isinstance(actions, list):
+                    for a in _actions:
+                        actions.append(
+                            Action(a["@name"], a)
+                        )
+                else:
+                    actions.append(
+                        Action(_actions["@name"], _actions)
+                    )
+            else:
+                actions = None
+            self.exception = Exception(
+                dict["exception"]["@name"], actions)
+        else:
+            self.exception = None
+
+    def __str__(self):
+        return "[Action: " + self.name+" " + str(self.exception) + "]"
+
+
+class Exception:
+    def __init__(self, name, actions):
+        self.name = name
+        self.actions = actions
+
+    def __str__(self):
+        s = ""
+        for a in self.actions:
+            s += " - [" + str(a) + "]"
+        return "[Exception: " + self.name+" " + s + "]"
+
+
+class Rule:
+    def __init__(self, name, value, exception):
+        self.name = name
+        self.value = value
+        self.exception = exception
+
+    def __str__(self):
+        return "[Rule: " + self.name+" = " + str(self.value) + "] " + str(self.exception)
+
+
+class PersonConfiguration:
+    def __init__(self, dict):
+        self.name = dict['person']['name']
+        self.description = dict['person']['description']
+        self.authonomy = PersonConfiguration.fillRules(
+            dict['person']['ethics'], 'autonomy')
+        self.privacy = PersonConfiguration.fillRules(
+            dict['person']['ethics'], 'privacy')
+        self.dignity = PersonConfiguration.fillRules(
+            dict['person']['ethics'], 'dignity')
+
+    @staticmethod
+    def fillRules(dict, key):
+        _list = []
+        try:
+            print(key)
+            elements = dict[key]['rule']
+            if isinstance(elements, list):
+                for rule in elements:
+                    try:
+                        action = Action(
+                            rule["exception"]["action"]["@name"], rule["exception"]["action"])
+                    except:
+                        action = None
+                    try:
+                        exception = Exception(
+                            rule["exception"]["@name"], [action])
+                    except:
+                        exception = None
+                    _list.append(
+                        Rule(rule["@name"], rule["@value"], exception)
+                    )
+            else:
+                try:
+                    action = Action(
+                        elements["exception"]["action"]["@name"], elements["exception"]["action"])
+                except:
+                    action = None
+                try:
+                    exception = Exception(
+                        elements["exception"]["@name"], [action])
+                except:
+                    exception = None
+                _list.append(
+                    Rule(elements["@name"], elements["@value"], exception)
+                )
+            for r in _list:
+                print(r)
+        except:
+            pass
+        return _list
+
+
+aliceConfiguration = PersonConfiguration(alice_dict)
+bobConfiguration = PersonConfiguration(bob_dict)
+
 
 class WorldCreator:
     def __init__(self, configuration, roomSize=(150, 200), doorSize=65, wallTickness=1, scale=0.1, resolution=1):
