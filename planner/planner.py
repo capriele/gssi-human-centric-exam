@@ -66,6 +66,8 @@ class Planner:
 
         # Patient based steps
         for p in self.robot.world.patientsList():
+            # TODO: add steps according patients configuration
+            config = p.patientConfiguration
             start_root.add_children([
                 py_trees.composites.Sequence(
                     "Visiting " + p.name,

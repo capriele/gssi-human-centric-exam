@@ -12,23 +12,23 @@
   <color>#0096FF</color>
   <ethics>
     <autonomy>
-      <rule name="accept-medication-reminder" value="true">
+      <rule name="accept_medication_reminder" value="true">
         <exception name="enough_repetition">
           <action name="do_call_nurse" />
         </exception>
       </rule>
     </autonomy>
     <privacy>
-      <rule name="accept-recording" value="true">
+      <rule name="accept_recording" value="true">
 	  	  <exception name="patient_is_in_toilet" />
       </rule>
-      <rule name="accept-distribution" value="false" />
-      <rule name="accept-storage" value="false">
+      <rule name="accept_distribution" value="false" />
+      <rule name="accept_storage" value="false">
 	  	  <exception name="data_is_health_sensitive" />
       </rule>
     </privacy>
     <dignity>
-      <rule name="accept-ambulatory-support" value="false" />
+      <rule name="accept_ambulatory_support" value="false" />
     </dignity>
   </ethics>
 </person>

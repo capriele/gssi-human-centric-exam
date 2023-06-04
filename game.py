@@ -35,7 +35,10 @@ class Action:
             self.exception = None
 
     def __str__(self):
-        return "[Action: " + self.name+" " + str(self.exception) + "]"
+        e = ""
+        if self.exception is not None:
+            e = str(self.exception)
+        return "\t\tAction: " + self.name+"\n\t" + e
 
 
 class Exception:
@@ -46,8 +49,9 @@ class Exception:
     def __str__(self):
         s = ""
         for a in self.actions:
-            s += " - [" + str(a) + "]"
-        return "[Exception: " + self.name+" " + s + "]"
+            if a is not None:
+                s += str(a)
+        return "\tException: " + self.name+"\n\t" + s
 
 
 class Rule:
@@ -57,7 +61,10 @@ class Rule:
         self.exception = exception
 
     def __str__(self):
-        return "[Rule: " + self.name+" = " + str(self.value) + "] " + str(self.exception)
+        e = ""
+        if self.exception is not None:
+            e = str(self.exception)
+        return "Rule: " + self.name+" = " + str(self.value) + "\n\t" + e
 
 
 class PersonConfiguration:
@@ -73,11 +80,23 @@ class PersonConfiguration:
         self.dignity = PersonConfiguration.fillRules(
             dict['person']['ethics'], 'dignity')
 
+    def __str__(self):
+        s = "[" + self.name + " Configuration]:\r\n"
+        s += "- Authonomy:\r\n"
+        for e in self.authonomy:
+            s += "\t" + str(e) + "\r\n"
+        s += "- Privacy:\r\n"
+        for e in self.privacy:
+            s += "\t" + str(e) + "\r\n"
+        s += "- Dignity:\r\n"
+        for e in self.dignity:
+            s += "\t" + str(e) + "\r\n"
+        return s
+
     @staticmethod
     def fillRules(dict, key):
         _list = []
         try:
-            print(key)
             elements = dict[key]['rule']
             if isinstance(elements, list):
                 for rule in elements:
@@ -108,8 +127,6 @@ class PersonConfiguration:
                 _list.append(
                     Rule(elements["@name"], elements["@value"], exception)
                 )
-            for r in _list:
-                print(r)
         except:
             pass
         return _list
@@ -248,6 +265,7 @@ for filename in os.listdir(directory):
         file = open(f).read()
         data = xmltodict.parse(file)
         patient = PersonConfiguration(data)
+        print(patient)
         patients.append(patient)
 for patient in patients:
     room = next(

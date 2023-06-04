@@ -10,7 +10,7 @@
   <color>#AA336A</color>
   <ethics>
     <autonomy>
-      <rule name="accept-health-status-check" value="true">
+      <rule name="accept_health_status_check" value="true">
         <exception name="patient_shows_signs_of_distress">
           <action name="do_call_legal_guardian">
             <exception name="legal_guardian_does_not_answer">
@@ -22,7 +22,7 @@
       </rule>
     </autonomy>
     <dignity>
-      <rule name="accept-ambulatory-support" value="true" />
+      <rule name="accept_ambulatory_support" value="true" />
     </dignity>
   </ethics>
 </person>
