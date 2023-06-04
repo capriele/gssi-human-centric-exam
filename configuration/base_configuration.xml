@@ -11,45 +11,21 @@
                 <id>0</id>
                 <name>Bob Room</name>
                 <color>#0096FF</color>
-                <patients>
-                    <patient>
-                        <name>Bob</name>
-                        <color>#0096FF</color>
-                    </patient>
-                </patients>
             </room>
             <room>
                 <id>1</id>
                 <name>Alice Room</name>
                 <color>#AA336A</color>
-                <patients>
-                    <patient>
-                        <name>Alice</name>
-                        <color>#AA336A</color>
-                    </patient>
-                </patients>
             </room>
             <room>
                 <id>2</id>
                 <name>Medical Room</name>
                 <color>#FFFFFF</color>
-                <patients>
-                    <patient>
-                        <name>Fake</name>
-                        <color>#0096FF</color>
-                    </patient>
-                </patients>
             </room>
             <room>
                 <id>3</id>
                 <name>Living Room</name>
                 <color>#00FF00</color>
-                <patients>
-                    <patient>
-                        <name>Fake</name>
-                        <color>#0096FF</color>
-                    </patient>
-                </patients>
             </room>
         </rooms>
     </hospital>

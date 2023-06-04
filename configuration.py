@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Sun May 28 17:11:36 2023 by generateDS.py version 2.12a.
+# Generated Sun Jun  4 18:04:10 2023 by generateDS.py version 2.12a.
 #
 
 import sys
@@ -948,11 +948,10 @@ class roomsType(GeneratedsSuper):
 class roomType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, id=None, name=None, color=None, patients=None):
+    def __init__(self, id=None, name=None, color=None):
         self.id = id
         self.name = name
         self.color = color
-        self.patients = patients
     def factory(*args_, **kwargs_):
         if roomType.subclass:
             return roomType.subclass(*args_, **kwargs_)
@@ -965,14 +964,11 @@ class roomType(GeneratedsSuper):
     def set_name(self, name): self.name = name
     def get_color(self): return self.color
     def set_color(self, color): self.color = color
-    def get_patients(self): return self.patients
-    def set_patients(self, patients): self.patients = patients
     def hasContent_(self):
         if (
             self.id is not None or
             self.name is not None or
-            self.color is not None or
-            self.patients is not None
+            self.color is not None
         ):
             return True
         else:
@@ -1009,8 +1005,6 @@ class roomType(GeneratedsSuper):
         if self.color is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%scolor>%s</%scolor>%s' % (namespace_, self.gds_format_string(quote_xml(self.color), input_name='color'), namespace_, eol_))
-        if self.patients is not None:
-            self.patients.export(outfile, level, namespace_, name_='patients', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='roomType'):
         level += 1
         already_processed = set()
@@ -1029,12 +1023,6 @@ class roomType(GeneratedsSuper):
         if self.color is not None:
             showIndent(outfile, level)
             outfile.write('color=%s,\n' % quote_python(self.color))
-        if self.patients is not None:
-            showIndent(outfile, level)
-            outfile.write('patients=model_.patientsType(\n')
-            self.patients.exportLiteral(outfile, level, name_='patients')
-            showIndent(outfile, level)
-            outfile.write('),\n')
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1061,177 +1049,7 @@ class roomType(GeneratedsSuper):
             color_ = child_.text
             color_ = self.gds_validate_string(color_, node, 'color')
             self.color = color_
-        elif nodeName_ == 'patients':
-            obj_ = patientsType.factory()
-            obj_.build(child_)
-            self.patients = obj_
 # end class roomType
-
-
-class patientsType(GeneratedsSuper):
-    subclass = None
-    superclass = None
-    def __init__(self, patient=None):
-        self.patient = patient
-    def factory(*args_, **kwargs_):
-        if patientsType.subclass:
-            return patientsType.subclass(*args_, **kwargs_)
-        else:
-            return patientsType(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_patient(self): return self.patient
-    def set_patient(self, patient): self.patient = patient
-    def hasContent_(self):
-        if (
-            self.patient is not None
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespace_='', name_='patientsType', namespacedef_='', pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='patientsType')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='patientsType'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='patientsType', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.patient is not None:
-            self.patient.export(outfile, level, namespace_, name_='patient', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='patientsType'):
-        level += 1
-        already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.patient is not None:
-            showIndent(outfile, level)
-            outfile.write('patient=model_.patientType(\n')
-            self.patient.exportLiteral(outfile, level, name_='patient')
-            showIndent(outfile, level)
-            outfile.write('),\n')
-    def build(self, node):
-        already_processed = set()
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == 'patient':
-            obj_ = patientType.factory()
-            obj_.build(child_)
-            self.patient = obj_
-# end class patientsType
-
-
-class patientType(GeneratedsSuper):
-    subclass = None
-    superclass = None
-    def __init__(self, name=None, color=None):
-        self.name = name
-        self.color = color
-    def factory(*args_, **kwargs_):
-        if patientType.subclass:
-            return patientType.subclass(*args_, **kwargs_)
-        else:
-            return patientType(*args_, **kwargs_)
-    factory = staticmethod(factory)
-    def get_name(self): return self.name
-    def set_name(self, name): self.name = name
-    def get_color(self): return self.color
-    def set_color(self, color): self.color = color
-    def hasContent_(self):
-        if (
-            self.name is not None or
-            self.color is not None
-        ):
-            return True
-        else:
-            return False
-    def export(self, outfile, level, namespace_='', name_='patientType', namespacedef_='', pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
-        already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='patientType')
-        if self.hasContent_():
-            outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
-            showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
-        else:
-            outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='patientType'):
-        pass
-    def exportChildren(self, outfile, level, namespace_='', name_='patientType', fromsubclass_=False, pretty_print=True):
-        if pretty_print:
-            eol_ = '\n'
-        else:
-            eol_ = ''
-        if self.name is not None:
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%sname>%s</%sname>%s' % (namespace_, self.gds_format_string(quote_xml(self.name), input_name='name'), namespace_, eol_))
-        if self.color is not None:
-            showIndent(outfile, level, pretty_print)
-            outfile.write('<%scolor>%s</%scolor>%s' % (namespace_, self.gds_format_string(quote_xml(self.color), input_name='color'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='patientType'):
-        level += 1
-        already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.name is not None:
-            showIndent(outfile, level)
-            outfile.write('name=%s,\n' % quote_python(self.name))
-        if self.color is not None:
-            showIndent(outfile, level)
-            outfile.write('color=%s,\n' % quote_python(self.color))
-    def build(self, node):
-        already_processed = set()
-        self.buildAttributes(node, node.attrib, already_processed)
-        for child in node:
-            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
-        return self
-    def buildAttributes(self, node, attrs, already_processed):
-        pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == 'name':
-            name_ = child_.text
-            name_ = self.gds_validate_string(name_, node, 'name')
-            self.name = name_
-        elif nodeName_ == 'color':
-            color_ = child_.text
-            color_ = self.gds_validate_string(color_, node, 'color')
-            self.color = color_
-# end class patientType
 
 
 class propertiesType(GeneratedsSuper):
@@ -1623,8 +1441,6 @@ GDSClassesMapping = {
     'behaviours': behavioursType,
     'rooms': roomsType,
     'room': roomType,
-    'patients': patientsType,
-    'patient': patientType,
     'property': propertyType,
     'behaviour': behaviourType,
 }
@@ -1749,8 +1565,6 @@ __all__ = [
     "behavioursType",
     "configuration",
     "hospitalType",
-    "patientType",
-    "patientsType",
     "propertiesType",
     "propertyType",
     "roomType",
