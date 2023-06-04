@@ -37,6 +37,7 @@ python $PATH$/generateDS.py -o configuration.py configuration/schema_configurati
 - [x] Implement PathPlanner, Verificator and Conditioner
 - [x] Load user from XML
 - [x] Automatically generate map from XML
+- [ ] Configure robot daily plan according patients XML (use patientConfiguration attribute)
 
 ## Exam Solution
 This software simulate in a 3D environment three human profiles (Bob, Alice and Nurse) and a robot that interacts with these characters and move inside the clinic. 
