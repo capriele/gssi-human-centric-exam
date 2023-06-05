@@ -611,7 +611,7 @@ def _cast(typ, value):
 #
 
 
-class configuration(GeneratedsSuper):
+class robot(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, id=None, name=None, color=None, description=None, hospital=None, properties=None, behaviours=None):
@@ -623,10 +623,10 @@ class configuration(GeneratedsSuper):
         self.properties = properties
         self.behaviours = behaviours
     def factory(*args_, **kwargs_):
-        if configuration.subclass:
-            return configuration.subclass(*args_, **kwargs_)
+        if robot.subclass:
+            return robot.subclass(*args_, **kwargs_)
         else:
-            return configuration(*args_, **kwargs_)
+            return robot(*args_, **kwargs_)
     factory = staticmethod(factory)
     def get_id(self): return self.id
     def set_id(self, id): self.id = id
@@ -655,7 +655,7 @@ class configuration(GeneratedsSuper):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='configuration', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespace_='', name_='robot', namespacedef_='', pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -663,7 +663,7 @@ class configuration(GeneratedsSuper):
         showIndent(outfile, level, pretty_print)
         outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='configuration')
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='robot')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
             self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
@@ -671,9 +671,9 @@ class configuration(GeneratedsSuper):
             outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='configuration'):
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='robot'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='configuration', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespace_='', name_='robot', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
@@ -696,7 +696,7 @@ class configuration(GeneratedsSuper):
             self.properties.export(outfile, level, namespace_, name_='properties', pretty_print=pretty_print)
         if self.behaviours is not None:
             self.behaviours.export(outfile, level, namespace_, name_='behaviours', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='configuration'):
+    def exportLiteral(self, outfile, level, name_='robot'):
         level += 1
         already_processed = set()
         self.exportLiteralAttributes(outfile, level, already_processed, name_)
@@ -777,7 +777,7 @@ class configuration(GeneratedsSuper):
             obj_ = behavioursType.factory()
             obj_.build(child_)
             self.behaviours = obj_
-# end class configuration
+# end class robot
 
 
 class hospitalType(GeneratedsSuper):
@@ -1469,8 +1469,8 @@ def parse(inFileName, silence=False):
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'configuration'
-        rootClass = configuration
+        rootTag = 'robot'
+        rootClass = robot
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
@@ -1489,8 +1489,8 @@ def parseEtree(inFileName, silence=False):
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'configuration'
-        rootClass = configuration
+        rootTag = 'robot'
+        rootClass = robot
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
@@ -1514,7 +1514,7 @@ def parseString(inString, silence=False):
     roots = get_root_tag(rootNode)
     rootClass = roots[1]
     if rootClass is None:
-        rootClass = configuration
+        rootClass = robot
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
@@ -1522,7 +1522,7 @@ def parseString(inString, silence=False):
     if not silence:
         sys.stdout.write('<?xml version="1.0" ?>\n')
         rootObj.export(
-            sys.stdout, 0, name_="configuration",
+            sys.stdout, 0, name_="robot",
             namespacedef_='')
     return rootObj
 
@@ -1532,15 +1532,15 @@ def parseLiteral(inFileName, silence=False):
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'configuration'
-        rootClass = configuration
+        rootTag = 'robot'
+        rootClass = robot
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
     doc = None
     if not silence:
-        sys.stdout.write('#from configuration import *\n\n')
-        sys.stdout.write('import configuration as model_\n\n')
+        sys.stdout.write('#from robot import *\n\n')
+        sys.stdout.write('import robot as model_\n\n')
         sys.stdout.write('rootObj = model_.rootTag(\n')
         rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
         sys.stdout.write(')\n')
@@ -1563,7 +1563,7 @@ if __name__ == '__main__':
 __all__ = [
     "behaviourType",
     "behavioursType",
-    "configuration",
+    "robot",
     "hospitalType",
     "propertiesType",
     "propertyType",

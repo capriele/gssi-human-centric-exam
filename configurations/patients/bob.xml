@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<patient>
+  <name>Bob</name>
+  <description>If I will refuse the medications or to take pills, it
+    is fine that the robot insists a few times. However, after a few
+    attempts it should call the nurse. I accept that the robot uses
+    cameras and microphones, however all my data cannot be distributed
+    to third parties. Moreover, the robot can only store and/or
+    distribute to the nurse videos and audios that are strictly
+    necessary for my health, and in any case videos cannot be recorded
+    in the toilet.</description>
+  <room>0</room>
+  <color>#0096FF</color>
+  <ethics>
+    <autonomy>
+      <rule name="accept_medication_reminder" value="true">
+        <exception name="enough_repetition">
+          <action name="do_call_nurse" />
+        </exception>
+      </rule>
+    </autonomy>
+    <privacy>
+      <rule name="accept_recording" value="true">
+        <exception name="patient_is_in_toilet" />
+      </rule>
+      <rule name="accept_distribution" value="false" />
+      <rule name="accept_storage" value="false">
+        <exception name="data_is_health_sensitive" />
+      </rule>
+    </privacy>
+    <dignity>
+      <rule name="accept_ambulatory_support" value="false" />
+    </dignity>
+  </ethics>
+</patient>

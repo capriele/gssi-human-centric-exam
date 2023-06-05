@@ -2,10 +2,11 @@ class Constants:
 
     WINDOW_TITLE = "Human-Centric Simulation"
 
-    CONFIGURER_BASE_XSD_SCHEMA = "./configuration/schema_configuration.xsd"
-
-    CONFIGURATION_BASE_XML_FILE = "./configuration/base_configuration.xml"
-
+    SCHEMA_XSD_ROBOT = "./schemas/robot.xsd"
+    SCHEMA_XSD_PATIENT = "./schemas/patient.xsd"
+    ROBOTS_CONFIGURATION_FOLDER = "./configurations/robots"
+    PATIENTS_CONFIGURATION_FOLDER = "./configurations/patients"
+    
     ROBOT_INITIAL_NUMBER_OF_PILLS = 0
     ROBOT_INITIAL_DELTA = 0.5
 
@@ -20,3 +21,4 @@ class Constants:
     TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS = 3
     TIMEOUT_IN_SECONDS_TO_PATIENT_INTERACTION = 2
     ROBOT_EXECUTION_ACTION_DT = 1
+    

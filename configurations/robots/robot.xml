@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<robot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <id>1</id>
     <name>Robot_1</name>
     <color>#FFA500</color>
@@ -42,4 +42,4 @@
         <behaviour key="if_patient_humor_bad" value="2">
         </behaviour>
     </behaviours>
-</configuration>
+</robot>

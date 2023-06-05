@@ -1,11 +1,12 @@
-<person>
+<?xml version="1.0" encoding="utf-8"?>
+<patient>
   <name>Alice</name>
-  <description>"I accept having assistive robots checking my health
-  status and supporting me, however, when I show signals of distress,
-  the robot should put me in contact with my daughter by making a
-  video call; if she does not answer the robot should ask the
-  intervention of a nurse and leave my room if I will be in my room of
-  move away from me."</description>
+  <description>I accept having assistive robots checking my health
+    status and supporting me, however, when I show signals of distress,
+    the robot should put me in contact with my daughter by making a
+    video call; if she does not answer the robot should ask the
+    intervention of a nurse and leave my room if I will be in my room of
+    move away from me.</description>
   <room>1</room>
   <color>#AA336A</color>
   <ethics>
@@ -25,4 +26,4 @@
       <rule name="accept_ambulatory_support" value="true" />
     </dignity>
   </ethics>
-</person>
+</patient>
