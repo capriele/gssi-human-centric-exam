@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Mon Jun  5 23:24:32 2023 by generateDS.py version 2.12a.
+# Generated Wed Jun  7 13:04:01 2023 by generateDS.py version 2.12a.
 #
 
 import sys
@@ -861,7 +861,10 @@ class autonomyType(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, rule=None):
-        self.rule = rule
+        if rule is None:
+            self.rule = []
+        else:
+            self.rule = rule
     def factory(*args_, **kwargs_):
         if autonomyType.subclass:
             return autonomyType.subclass(*args_, **kwargs_)
@@ -870,9 +873,11 @@ class autonomyType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_rule(self): return self.rule
     def set_rule(self, rule): self.rule = rule
+    def add_rule(self, value): self.rule.append(value)
+    def insert_rule(self, index, value): self.rule[index] = value
     def hasContent_(self):
         if (
-            self.rule is not None
+            self.rule
         ):
             return True
         else:
@@ -900,8 +905,8 @@ class autonomyType(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.rule is not None:
-            self.rule.export(outfile, level, namespace_, name_='rule', pretty_print=pretty_print)
+        for rule_ in self.rule:
+            rule_.export(outfile, level, namespace_, name_='rule', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='autonomyType'):
         level += 1
         already_processed = set()
@@ -911,12 +916,18 @@ class autonomyType(GeneratedsSuper):
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
     def exportLiteralChildren(self, outfile, level, name_):
-        if self.rule is not None:
+        showIndent(outfile, level)
+        outfile.write('rule=[\n')
+        level += 1
+        for rule_ in self.rule:
             showIndent(outfile, level)
-            outfile.write('rule=model_.ruleType(\n')
-            self.rule.exportLiteral(outfile, level, name_='rule')
+            outfile.write('model_.ruleType(\n')
+            rule_.exportLiteral(outfile, level, name_='ruleType')
             showIndent(outfile, level)
             outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -930,7 +941,7 @@ class autonomyType(GeneratedsSuper):
         if nodeName_ == 'rule':
             obj_ = ruleType.factory()
             obj_.build(child_)
-            self.rule = obj_
+            self.rule.append(obj_)
 # end class autonomyType
 
 
@@ -940,7 +951,10 @@ class ruleType(GeneratedsSuper):
     def __init__(self, name=None, value=None, exception=None):
         self.name = _cast(None, name)
         self.value = _cast(None, value)
-        self.exception = exception
+        if exception is None:
+            self.exception = []
+        else:
+            self.exception = exception
     def factory(*args_, **kwargs_):
         if ruleType.subclass:
             return ruleType.subclass(*args_, **kwargs_)
@@ -949,13 +963,15 @@ class ruleType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_exception(self): return self.exception
     def set_exception(self, exception): self.exception = exception
+    def add_exception(self, value): self.exception.append(value)
+    def insert_exception(self, index, value): self.exception[index] = value
     def get_name(self): return self.name
     def set_name(self, name): self.name = name
     def get_value(self): return self.value
     def set_value(self, value): self.value = value
     def hasContent_(self):
         if (
-            self.exception is not None
+            self.exception
         ):
             return True
         else:
@@ -988,8 +1004,8 @@ class ruleType(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.exception is not None:
-            self.exception.export(outfile, level, namespace_, name_='exception', pretty_print=pretty_print)
+        for exception_ in self.exception:
+            exception_.export(outfile, level, namespace_, name_='exception', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='ruleType'):
         level += 1
         already_processed = set()
@@ -1006,12 +1022,18 @@ class ruleType(GeneratedsSuper):
             showIndent(outfile, level)
             outfile.write('value="%s",\n' % (self.value,))
     def exportLiteralChildren(self, outfile, level, name_):
-        if self.exception is not None:
+        showIndent(outfile, level)
+        outfile.write('exception=[\n')
+        level += 1
+        for exception_ in self.exception:
             showIndent(outfile, level)
-            outfile.write('exception=model_.exceptionType(\n')
-            self.exception.exportLiteral(outfile, level, name_='exception')
+            outfile.write('model_.exceptionType(\n')
+            exception_.exportLiteral(outfile, level, name_='exceptionType')
             showIndent(outfile, level)
             outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1032,7 +1054,7 @@ class ruleType(GeneratedsSuper):
         if nodeName_ == 'exception':
             obj_ = exceptionType.factory()
             obj_.build(child_)
-            self.exception = obj_
+            self.exception.append(obj_)
 # end class ruleType
 
 
@@ -1041,7 +1063,10 @@ class exceptionType(GeneratedsSuper):
     superclass = None
     def __init__(self, name=None, action=None):
         self.name = _cast(None, name)
-        self.action = action
+        if action is None:
+            self.action = []
+        else:
+            self.action = action
     def factory(*args_, **kwargs_):
         if exceptionType.subclass:
             return exceptionType.subclass(*args_, **kwargs_)
@@ -1050,11 +1075,13 @@ class exceptionType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_action(self): return self.action
     def set_action(self, action): self.action = action
+    def add_action(self, value): self.action.append(value)
+    def insert_action(self, index, value): self.action[index] = value
     def get_name(self): return self.name
     def set_name(self, name): self.name = name
     def hasContent_(self):
         if (
-            self.action is not None
+            self.action
         ):
             return True
         else:
@@ -1084,8 +1111,8 @@ class exceptionType(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.action is not None:
-            self.action.export(outfile, level, namespace_, name_='action', pretty_print=pretty_print)
+        for action_ in self.action:
+            action_.export(outfile, level, namespace_, name_='action', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='exceptionType'):
         level += 1
         already_processed = set()
@@ -1098,12 +1125,18 @@ class exceptionType(GeneratedsSuper):
             showIndent(outfile, level)
             outfile.write('name="%s",\n' % (self.name,))
     def exportLiteralChildren(self, outfile, level, name_):
-        if self.action is not None:
+        showIndent(outfile, level)
+        outfile.write('action=[\n')
+        level += 1
+        for action_ in self.action:
             showIndent(outfile, level)
-            outfile.write('action=model_.actionType(\n')
-            self.action.exportLiteral(outfile, level, name_='action')
+            outfile.write('model_.actionType(\n')
+            action_.exportLiteral(outfile, level, name_='actionType')
             showIndent(outfile, level)
             outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1120,7 +1153,7 @@ class exceptionType(GeneratedsSuper):
         if nodeName_ == 'action':
             obj_ = actionType.factory()
             obj_.build(child_)
-            self.action = obj_
+            self.action.append(obj_)
 # end class exceptionType
 
 
@@ -1129,7 +1162,10 @@ class actionType(GeneratedsSuper):
     superclass = None
     def __init__(self, name=None, exception=None):
         self.name = _cast(None, name)
-        self.exception = exception
+        if exception is None:
+            self.exception = []
+        else:
+            self.exception = exception
     def factory(*args_, **kwargs_):
         if actionType.subclass:
             return actionType.subclass(*args_, **kwargs_)
@@ -1138,11 +1174,13 @@ class actionType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_exception(self): return self.exception
     def set_exception(self, exception): self.exception = exception
+    def add_exception(self, value): self.exception.append(value)
+    def insert_exception(self, index, value): self.exception[index] = value
     def get_name(self): return self.name
     def set_name(self, name): self.name = name
     def hasContent_(self):
         if (
-            self.exception is not None
+            self.exception
         ):
             return True
         else:
@@ -1172,8 +1210,8 @@ class actionType(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.exception is not None:
-            self.exception.export(outfile, level, namespace_, name_='exception', pretty_print=pretty_print)
+        for exception_ in self.exception:
+            exception_.export(outfile, level, namespace_, name_='exception', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='actionType'):
         level += 1
         already_processed = set()
@@ -1186,12 +1224,18 @@ class actionType(GeneratedsSuper):
             showIndent(outfile, level)
             outfile.write('name="%s",\n' % (self.name,))
     def exportLiteralChildren(self, outfile, level, name_):
-        if self.exception is not None:
+        showIndent(outfile, level)
+        outfile.write('exception=[\n')
+        level += 1
+        for exception_ in self.exception:
             showIndent(outfile, level)
-            outfile.write('exception=model_.exceptionType1(\n')
-            self.exception.exportLiteral(outfile, level, name_='exception')
+            outfile.write('model_.exceptionType1(\n')
+            exception_.exportLiteral(outfile, level, name_='exceptionType1')
             showIndent(outfile, level)
             outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1208,7 +1252,7 @@ class actionType(GeneratedsSuper):
         if nodeName_ == 'exception':
             obj_ = exceptionType1.factory()
             obj_.build(child_)
-            self.exception = obj_
+            self.exception.append(obj_)
 # end class actionType
 
 
@@ -1483,7 +1527,10 @@ class ruleType3(GeneratedsSuper):
     def __init__(self, name=None, value=None, exception=None, valueOf_=None, mixedclass_=None, content_=None):
         self.name = _cast(None, name)
         self.value = _cast(None, value)
-        self.exception = exception
+        if exception is None:
+            self.exception = []
+        else:
+            self.exception = exception
         self.valueOf_ = valueOf_
         if mixedclass_ is None:
             self.mixedclass_ = MixedContainer
@@ -1502,6 +1549,8 @@ class ruleType3(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_exception(self): return self.exception
     def set_exception(self, exception): self.exception = exception
+    def add_exception(self, value): self.exception.append(value)
+    def insert_exception(self, index, value): self.exception[index] = value
     def get_name(self): return self.name
     def set_name(self, name): self.name = name
     def get_value(self): return self.value
@@ -1510,7 +1559,7 @@ class ruleType3(GeneratedsSuper):
     def set_valueOf_(self, valueOf_): self.valueOf_ = valueOf_
     def hasContent_(self):
         if (
-            self.exception is not None or
+            self.exception or
             self.valueOf_
         ):
             return True
@@ -1689,7 +1738,10 @@ class dignityType(GeneratedsSuper):
     subclass = None
     superclass = None
     def __init__(self, rule=None):
-        self.rule = rule
+        if rule is None:
+            self.rule = []
+        else:
+            self.rule = rule
     def factory(*args_, **kwargs_):
         if dignityType.subclass:
             return dignityType.subclass(*args_, **kwargs_)
@@ -1698,9 +1750,11 @@ class dignityType(GeneratedsSuper):
     factory = staticmethod(factory)
     def get_rule(self): return self.rule
     def set_rule(self, rule): self.rule = rule
+    def add_rule(self, value): self.rule.append(value)
+    def insert_rule(self, index, value): self.rule[index] = value
     def hasContent_(self):
         if (
-            self.rule is not None
+            self.rule
         ):
             return True
         else:
@@ -1728,8 +1782,8 @@ class dignityType(GeneratedsSuper):
             eol_ = '\n'
         else:
             eol_ = ''
-        if self.rule is not None:
-            self.rule.export(outfile, level, namespace_, name_='rule', pretty_print=pretty_print)
+        for rule_ in self.rule:
+            rule_.export(outfile, level, namespace_, name_='rule', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='dignityType'):
         level += 1
         already_processed = set()
@@ -1739,12 +1793,18 @@ class dignityType(GeneratedsSuper):
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
     def exportLiteralChildren(self, outfile, level, name_):
-        if self.rule is not None:
+        showIndent(outfile, level)
+        outfile.write('rule=[\n')
+        level += 1
+        for rule_ in self.rule:
             showIndent(outfile, level)
-            outfile.write('rule=model_.ruleType5(\n')
-            self.rule.exportLiteral(outfile, level, name_='rule')
+            outfile.write('model_.ruleType5(\n')
+            rule_.exportLiteral(outfile, level, name_='ruleType5')
             showIndent(outfile, level)
             outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1758,7 +1818,7 @@ class dignityType(GeneratedsSuper):
         if nodeName_ == 'rule':
             obj_ = ruleType5.factory()
             obj_.build(child_)
-            self.rule = obj_
+            self.rule.append(obj_)
 # end class dignityType
 
 

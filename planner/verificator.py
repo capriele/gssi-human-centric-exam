@@ -1,7 +1,4 @@
-from configurer import Configurer
-from constants import Constants
 from logger import Logger
-
 
 class PlanVerificator:
     def __init__(self, configuration):

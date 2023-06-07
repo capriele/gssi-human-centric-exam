@@ -1,12 +1,10 @@
-from configurer import Configurer
-from constants import Constants
 from logger import Logger
-
 from . import actions as a
 from .conditioner import *
 from .verificator import *
 import py_trees
 import operator
+from patient_utils import get_items_from_patient_configuration
 
 
 class Planner:
@@ -47,7 +45,7 @@ class Planner:
                 a.ExecutionAction(
                     name="Take Pills",
                     onComplete=lambda: (
-                        print("Pills Taken"),
+                        Logger.i("Pills Taken"),
                         self.robot.setPills(self.robot.world.patientsCount()),
                     ),
                 ),
@@ -67,7 +65,8 @@ class Planner:
         # Patient based steps
         for p in self.robot.world.patientsList():
             # TODO: add steps according patients configuration
-            config = p.patientConfiguration
+            patient_items = get_items_from_patient_configuration(p.patientConfiguration)
+            
             start_root.add_children([
                 py_trees.composites.Sequence(
                     "Visiting " + p.name,
@@ -98,6 +97,12 @@ class Planner:
                                 "Visiting " + p.name,
                                 memory=True,
                             ).add_children([
+                                a.MovingAction(
+                                    name="Check health status",
+                                    planner=self,
+                                    patient=p,
+                                    target=p.position
+                                ),
                                 a.MovingAction(
                                     name="Give pill to " + p.name,
                                     planner=self,

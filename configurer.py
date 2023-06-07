@@ -35,4 +35,4 @@ class Configurer:
         if self.schema:
             return self.schema.is_valid(xml_filename)
         else:
-            Logger.e(f"XML schema is not valid loaded...")
+            Logger.e(f"XML is not valid...")
