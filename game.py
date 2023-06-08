@@ -213,6 +213,7 @@ robotClass = Robot(robot, world, robot_configuration)
 status_text = Text("", color=color.green, scale=1, x=-0.6, y=-0.36, z=0)
 conversation_text = Text("", color=color.red, scale=1, x=-0.6, y=-0.4, z=0)
 
+cp_changed = True
 cp = Vec3(0, 0, 110)
 camera.position = cp
 camera.rotation_y = 180
@@ -228,9 +229,11 @@ def input(key):
     elif "scroll up" in key:
         cp.z += 2
         camera.position = cp
+        cp_changed = True
     elif "scroll down" in key:
         cp.z -= 2
         camera.position = cp
+        cp_changed = True
 
 
 pressed_key = None
@@ -261,6 +264,9 @@ def disable_held_keys(key):
 
 def update():
     global pressed_key
+    global status_text
+    global conversation_text
+    global cp_changed
 
     if held_keys[Constants.KEY_RESET] == 1:
         Logger.i(f"Pressed key {held_keys[Constants.KEY_RESET]}...")
@@ -279,8 +285,29 @@ def update():
             Logger.i(f"Pressed key {held_keys[Constants.KEY_NO]}...")
             disable_held_keys(Constants.KEY_NO)
             robotClass.setAnswer(False)
-
-    Room.write_rooms_name()
+ 
+    if cp_changed:
+        cp_changed = False
+        Room.write_rooms_name()
+        x_min, x_max, y_min, y_max = Room.min_bounding_rectangle()
+        status_string = status_text.text
+        conversation_string = conversation_text.text
+        destroy(status_text)
+        destroy(conversation_text)
+        point1 = world_position_to_screen_position((x_min, y_min-4))
+        point2 = world_position_to_screen_position((x_min, y_min-6))
+        status_text = Text(
+            status_string,
+            color=color.green,
+            position=(-point1.x, point1.y, 0),
+            scale=1
+        )
+        conversation_text = Text(
+            conversation_string,
+            color=color.red,
+            position=(-point2.x, point2.y, 0),
+            scale=1
+        )
 
     robotClass.update(
         dt=time.dt, status_text=status_text, conversation_text=conversation_text
