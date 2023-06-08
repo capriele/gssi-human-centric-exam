@@ -37,17 +37,20 @@ class Room:
 
     @staticmethod
     def write_rooms_name():
+        x_min, x_max, y_min, y_max = Room.min_bounding_rectangle()
         for t in Room.rooms_name_entities:
             destroy(t)
         for room in Room.rooms:
             if room.name.lower() != "corridor":
                 point = world_position_to_screen_position(
                     (room.center.x, room.center.y))
+                point2 = world_position_to_screen_position(
+                    (room.center.x, y_max + 1))
                 t = Text(
                     room.name,
                     color=color.hex(room.color),
                     origin=(0, 0, 0),
-                    position=(point.x, 0.35, 0),
+                    position=(point.x, point2.y, 0),
                     scale=0.7
                 )
                 Room.rooms_name_entities.append(t)
