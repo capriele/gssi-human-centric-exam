@@ -224,6 +224,7 @@ camera.rotation_z = 0
 
 def input(key):
     global cp
+    global cp_changed
     if key == "escape":
         quit()
     elif "scroll up" in key:
