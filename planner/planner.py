@@ -65,6 +65,21 @@ class Planner:
         # Patient based steps
         for p in self.robot.world.patientsList():
             # TODO: add steps according patients configuration
+            '''
+            Per distinguere i casi aggiungo un dizionario nel robot con i tasks specifici per paziente
+            Posso gestire le azioni da fare con questi metodi (di py_trees.composites.Sequence):
+            - def add_child(self, child: behaviour.Behaviour) -> uuid.UUID
+            - def add_children(self, children: typing.List[behaviour.Behaviour]) -> behaviour.Behaviour
+            - def remove_child(self, child: behaviour.Behaviour) -> int
+            - def remove_all_children(self) -> None
+            - def replace_child(self, child: behaviour.Behaviour, replacement: behaviour.Behaviour) -> None
+            - def remove_child_by_id(self, child_id: uuid.UUID) -> None
+            - def prepend_child(self, child: behaviour.Behaviour) -> uuid.UUID
+            - def insert_child(self, child: behaviour.Behaviour, index: int) -> uuid.UUID
+
+            Questi metodi dovrebbero essere utilizzati solamente all'interno del metodo *update* di un **InteractionAction**
+            poichè solamente quando interagisco con l'utente posso capire come comportarmi.
+            '''
             patient_items = get_items_from_patient_configuration(p.patientConfiguration)
             
             start_root.add_children([
