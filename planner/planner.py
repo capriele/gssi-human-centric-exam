@@ -80,85 +80,87 @@ class Planner:
             Questi metodi dovrebbero essere utilizzati solamente all'interno del metodo *update* di un **InteractionAction**
             poichè solamente quando interagisco con l'utente posso capire come comportarmi.
             '''
-            patient_items = get_items_from_patient_configuration(p.patientConfiguration)
-            
-            start_root.add_children([
-                py_trees.composites.Sequence(
-                    "Visiting " + p.name,
-                    memory=True,
-                ).add_children([
-                    a.MovingAction(
-                        name="Going to " + p.name + " Room",
-                        planner=self,
-                        patient=p,
-                        target=p.room.door,
-                    ),
-                    a.InteractionAction(
-                        name=p.name + ", can I enter?",
-                        planner=self,
-                        patient=p,
-                        onComplete=lambda: (),
-                    ),
-                    py_trees.idioms.either_or(
-                        name="Interacting with " + p.name,
-                        conditions=[
-                            py_trees.common.ComparisonExpression(
-                                p.name.lower()+"_can_enter", True, operator.eq),
-                            py_trees.common.ComparisonExpression(
-                                p.name.lower()+"_can_enter", False, operator.eq),
-                        ],
-                        subtrees=[
-                            py_trees.composites.Sequence(
-                                "Visiting " + p.name,
-                                memory=True,
-                            ).add_children([
-                                a.MovingAction(
-                                    name="Check health status",
-                                    planner=self,
-                                    patient=p,
-                                    target=p.position
+            patient_items = get_items_from_patient_configuration(
+                p.patientConfiguration)
+
+            # TODO: configurare le azioni del robot in funzione della configurazione "statica" del paziente
+            self.robot.patientPlan[p] = py_trees.composites.Sequence(
+                "Visiting " + p.name,
+                memory=True,
+            ).add_children([
+                a.MovingAction(
+                    name="Going to " + p.name + " Room",
+                    planner=self,
+                    patient=p,
+                    target=p.room.door,
+                ),
+                a.InteractionAction(
+                    name=p.name + ", can I enter?",
+                    planner=self,
+                    patient=p,
+                    onComplete=lambda: (),
+                ),
+                py_trees.idioms.either_or(
+                    name="Interacting with " + p.name,
+                    conditions=[
+                        py_trees.common.ComparisonExpression(
+                            p.name.lower()+"_can_enter", True, operator.eq),
+                        py_trees.common.ComparisonExpression(
+                            p.name.lower()+"_can_enter", False, operator.eq),
+                    ],
+                    subtrees=[
+                        py_trees.composites.Sequence(
+                            "Visiting " + p.name,
+                            memory=True,
+                        ).add_children([
+                            a.MovingAction(
+                                name="Check health status",
+                                planner=self,
+                                patient=p,
+                                target=p.position
+                            ),
+                            a.MovingAction(
+                                name="Give pill to " + p.name,
+                                planner=self,
+                                patient=p,
+                                target=p.position,
+                            ),
+                            a.ExecutionAction(
+                                name=p.name + " takes the pill",
+                                onComplete=lambda: (
+                                    self.robot.decreasePills(),
                                 ),
-                                a.MovingAction(
-                                    name="Give pill to " + p.name,
-                                    planner=self,
-                                    patient=p,
-                                    target=p.position,
-                                ),
-                                a.ExecutionAction(
-                                    name=p.name + " takes the pill",
-                                    onComplete=lambda: (
-                                        self.robot.decreasePills(),
-                                    ),
-                                ),
-                                a.MovingAction(
-                                    name="Exiting from " + p.name + " Room",
-                                    planner=self,
-                                    patient=p,
-                                    target=p.room.door,
-                                ),
-                            ]),
-                            py_trees.composites.Sequence(
-                                "Visiting " + p.name,
-                                memory=True,
-                            ).add_children([
-                                a.MovingAction(
-                                    name="Calling the nurse",
-                                    planner=self,
-                                    patient=p,
-                                    target=self.robot.world.findPlayer(
-                                        "nurse").position,
-                                ),
-                                a.MovingAction(
-                                    name="Going back to base",
-                                    planner=self,
-                                    target=self.robot.base
-                                ),
-                            ]),
-                        ],
-                        namespace=p.name.lower()+"_either_or",
-                    ),
-                ])
+                            ),
+                            a.MovingAction(
+                                name="Exiting from " + p.name + " Room",
+                                planner=self,
+                                patient=p,
+                                target=p.room.door,
+                            ),
+                        ]),
+                        py_trees.composites.Sequence(
+                            "Visiting " + p.name,
+                            memory=True,
+                        ).add_children([
+                            a.MovingAction(
+                                name="Calling the nurse",
+                                planner=self,
+                                patient=p,
+                                target=self.robot.world.findPlayer(
+                                    "nurse").position,
+                            ),
+                            a.MovingAction(
+                                name="Going back to base",
+                                planner=self,
+                                target=self.robot.base
+                            ),
+                        ]),
+                    ],
+                    namespace=p.name.lower()+"_either_or",
+                ),
             ])
+
+            start_root.add_children([self.robot.patientPlan[p]])
 
         # Standard steps
         start_root.add_children([

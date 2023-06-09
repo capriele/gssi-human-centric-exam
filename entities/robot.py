@@ -28,6 +28,7 @@ class Robot:
         self.pills = Constants.ROBOT_INITIAL_NUMBER_OF_PILLS
         self.base = self.world.robotBaseCoords()
         self.planner = Planner(self)
+        self.patientPlan = dict()
 
     def setStatus(self, text):
         self.status = text

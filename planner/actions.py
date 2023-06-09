@@ -124,6 +124,28 @@ class InteractionAction(py_trees.behaviour.Behaviour):
             if self._answer is not None and (time.time() - self.startTime) > Constants.TIMEOUT_IN_SECONDS_TO_PATIENT_INTERACTION:
                 self.startTime = time.time()
 
+                '''
+                - def add_child(self, child: behaviour.Behaviour) -> uuid.UUID
+                - def add_children(self, children: typing.List[behaviour.Behaviour]) -> behaviour.Behaviour
+                - def remove_child(self, child: behaviour.Behaviour) -> int
+                - def remove_all_children(self) -> None
+                - def replace_child(self, child: behaviour.Behaviour, replacement: behaviour.Behaviour) -> None
+                - def remove_child_by_id(self, child_id: uuid.UUID) -> None
+                - def prepend_child(self, child: behaviour.Behaviour) -> uuid.UUID
+                - def insert_child(self, child: behaviour.Behaviour, index: int) -> uuid.UUID
+                '''
+                '''
+                #TODO: aggiungere rimuovere le azioni del robot in funzione della configurazione "dynamica" del paziente
+                self.planner.robot.patientPlan[self.patient].add_child(
+                    ExecutionAction(
+                        name="Test",
+                        onComplete=lambda: (
+                            self.robot.setStatus("Test Action"),
+                        ),
+                    ),
+                )
+                '''
+
                 if self._answer:
                     # The patient said Yes
                     new_status = py_trees.common.Status.SUCCESS
@@ -199,7 +221,7 @@ if __name__ == '__main__':
     behaviour_tree = py_trees.trees.BehaviourTree(
         root=root
     )
-    #py_trees.display.render_dot_tree(root)
+    # py_trees.display.render_dot_tree(root)
     behaviour_tree.setup(timeout=15)
 
     def print_tree(tree):
