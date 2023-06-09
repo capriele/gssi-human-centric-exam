@@ -9,6 +9,7 @@ import threading
 import time
 import os
 
+
 class WorldCreator:
     def __init__(
         self,
@@ -27,19 +28,21 @@ class WorldCreator:
             rooms_name.append(r.get_name())
             rooms_color.append(r.get_color())
 
-        roomSize = (int(roomSize[0] * resolution), int(roomSize[1] * resolution))
+        roomSize = (int(roomSize[0] * resolution),
+                    int(roomSize[1] * resolution))
         doorSize = int(doorSize * resolution)
 
         roomsCount = len(rooms_name)
         self.scale = scale
         self.map = np.zeros(
-            (int(roomSize[0] * roomsCount), int(roomSize[1] + 100 * resolution))
+            (int(roomSize[0] * roomsCount),
+             int(roomSize[1] + 100 * resolution))
         )
         mapSize = self.map.shape
         self.map[0:wallTickness, :] = 1
-        self.map[mapSize[0] - wallTickness : mapSize[0], :] = 1
+        self.map[mapSize[0] - wallTickness: mapSize[0], :] = 1
         self.map[:, 0:wallTickness] = 1
-        self.map[:, mapSize[1] - wallTickness : mapSize[1]] = 1
+        self.map[:, mapSize[1] - wallTickness: mapSize[1]] = 1
 
         x1 = 0 + wallTickness
         y1 = 0 + wallTickness
@@ -71,14 +74,14 @@ class WorldCreator:
         for i in range(0, roomsCount):
             # Vertical
             self.map[
-                i * roomSize[0] : i * roomSize[0] + wallTickness,
-                mapSize[1] - roomSize[1] : mapSize[1],
+                i * roomSize[0]: i * roomSize[0] + wallTickness,
+                mapSize[1] - roomSize[1]: mapSize[1],
             ] = 1
 
             # Horizontal
             self.map[
-                i * roomSize[0] : (i + 1) * roomSize[0] - doorSize,
-                mapSize[1] - roomSize[1] : mapSize[1] - roomSize[1] + wallTickness,
+                i * roomSize[0]: (i + 1) * roomSize[0] - doorSize,
+                mapSize[1] - roomSize[1]: mapSize[1] - roomSize[1] + wallTickness,
             ] = 1
 
             x1 = i * roomSize[0] + wallTickness
@@ -149,7 +152,8 @@ class WorldCreator:
 
 robot_configurer = Configurer(Constants.SCHEMA_XSD_ROBOT)
 robot_configuration = robot_configurer.load(
-    os.path.join(Constants.ROBOTS_CONFIGURATION_FOLDER, "robot.xml"), robot.parse
+    os.path.join(Constants.ROBOTS_CONFIGURATION_FOLDER,
+                 "robot.xml"), robot.parse
 )
 
 patient_configurer = Configurer(Constants.SCHEMA_XSD_PATIENT)
@@ -171,7 +175,8 @@ for filename in os.listdir(Constants.PATIENTS_CONFIGURATION_FOLDER):
         patients.append(p)
 
 for patient in patients:
-    room = next((room for room in wc.rooms if room.id == patient.get_room()), None)
+    room = next((room for room in wc.rooms if room.id ==
+                patient.get_room()), None)
     if room is not None:
         p = Player(
             model="cube",
@@ -201,7 +206,8 @@ nurse = Player(
     is_human=True,
     is_staff=True,
     color=color.white,
-    position=Vec3(wc.corridor.center.x - length / 3.0, wc.corridor.center.y, 0),
+    position=Vec3(wc.corridor.center.x - length /
+                  3.0, wc.corridor.center.y, 0),
     scale=2,
 )
 
@@ -257,13 +263,18 @@ def disable_held_keys(key):
     lock = threading.Lock()
     lock.acquire()
     thread = threading.Thread(
-        target=unset_pressed_key, args=[Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS]
+        target=unset_pressed_key, args=[
+            Constants.TIMEOUT_IN_SECONDS_TO_REACTIVATE_KEYS]
     )
     thread.start()
     lock.release()
 
 
+update_count = 0
+
+
 def update():
+    global update_count
     global pressed_key
     global status_text
     global conversation_text
@@ -286,8 +297,10 @@ def update():
             Logger.i(f"Pressed key {held_keys[Constants.KEY_NO]}...")
             disable_held_keys(Constants.KEY_NO)
             robotClass.setAnswer(False)
- 
-    if cp_changed:
+
+    if update_count < 10 or cp_changed:
+        if update_count < 10:
+            update_count += 1
         cp_changed = False
         Room.write_rooms_name()
         x_min, x_max, y_min, y_max = Room.min_bounding_rectangle()
