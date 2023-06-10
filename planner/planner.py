@@ -244,49 +244,45 @@ class Planner:
                     ),
                 ]),
 
-            patient_items['dignity_rule_accept_ambulatory_support']
-            patient_items['autonomy_rule_accept_medication_reminder']
-            patient_items['autonomy_exception_enough_repetition']
-            """ patient_items['privacy_exception_data_is_health_sensitive'] """
-
-            self.robot.patientPlan[p] = py_trees.composites.Sequence(
-                "Visiting " + p.name,
-                memory=True,
-            ).add_children([
-                a.MovingAction(
-                    name="Going to " + p.name + " Room",
-                    planner=self,
-                    patient=p,
-                    target=p.room.door,
-                ),
-                a.ExecutionAction(
-                    name="Process " + p.name + " privacy rules",
-                    onComplete=lambda: (
-                        self.robot.configureSensorAccordingPatientPrivacy(
-                            patient_items),
+            if patient_items['dignity_rule_accept_ambulatory_support'] is not None and patient_items['dignity_rule_accept_ambulatory_support'].value:
+                self.robot.patientPlan[p] = py_trees.composites.Sequence(
+                    "Visiting " + p.name,
+                    memory=True,
+                ).add_children([
+                    a.MovingAction(
+                        name="Going to " + p.name + " Room",
+                        planner=self,
+                        patient=p,
+                        target=p.room.door,
                     ),
-                ),
-                a.InteractionAction(
-                    name=p.name + ", can I enter?",
-                    planner=self,
-                    patient=p,
-                    onComplete=lambda: (),
-                ),
-                py_trees.idioms.either_or(
-                    name="Interacting with " + p.name,
-                    conditions=[
-                        py_trees.common.ComparisonExpression(
-                            p.name.lower()+"_can_enter", True, operator.eq),
-                        py_trees.common.ComparisonExpression(
-                            p.name.lower()+"_can_enter", False, operator.eq),
-                    ],
-                    subtrees=[
-                        step_can_enter,
-                        copy.copy(step_cannot_enter),
-                    ],
-                ),
-            ])
-            start_root.add_children([self.robot.patientPlan[p]])
+                    a.ExecutionAction(
+                        name="Process " + p.name + " privacy rules",
+                        onComplete=lambda: (
+                            self.robot.configureSensorAccordingPatientPrivacy(
+                                patient_items),
+                        ),
+                    ),
+                    a.InteractionAction(
+                        name=p.name + ", can I enter?",
+                        planner=self,
+                        patient=p,
+                        onComplete=lambda: (),
+                    ),
+                    py_trees.idioms.either_or(
+                        name="Interacting with " + p.name,
+                        conditions=[
+                            py_trees.common.ComparisonExpression(
+                                p.name.lower()+"_can_enter", True, operator.eq),
+                            py_trees.common.ComparisonExpression(
+                                p.name.lower()+"_can_enter", False, operator.eq),
+                        ],
+                        subtrees=[
+                            step_can_enter,
+                            copy.copy(step_cannot_enter),
+                        ],
+                    ),
+                ])
+                start_root.add_children([self.robot.patientPlan[p]])
 
         # Standard steps
         start_root.add_children([
