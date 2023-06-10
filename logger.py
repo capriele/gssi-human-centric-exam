@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Logger:
     """
     The Logger class provides static methods to log error and success messages.
@@ -11,7 +13,7 @@ class Logger:
         Parameters:
         - msg (str): The error message to be logged.
         """
-        print(f"[Error]: {msg}")
+        print(f"[{datetime.now().time().strftime('%H:%M:%S')}][Error]: {msg}")
 
     @staticmethod
     def s(msg):
@@ -21,7 +23,7 @@ class Logger:
         Parameters:
         - msg (str): The success message to be logged.
         """
-        print(f"[Success]: {msg}")
+        print(f"[{datetime.now().time().strftime('%H:%M:%S')}][Success]: {msg}")
         
     @staticmethod
     def i(msg):
@@ -31,4 +33,4 @@ class Logger:
         Parameters:
         - msg (str): The info message to be logged.
         """
-        print(f"[Info]: {msg}")
+        print(f"[{datetime.now().time().strftime('%H:%M:%S')}][Info]: {msg}")
