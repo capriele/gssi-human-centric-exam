@@ -5,6 +5,7 @@ from .verificator import *
 import py_trees
 import operator
 from patient_utils import get_items_from_patient_configuration
+import copy
 
 
 class Planner:
@@ -87,7 +88,8 @@ class Planner:
             step_cannot_enter = py_trees.composites.Sequence(
                 "Visiting " + p.name,
                 memory=True,
-            ).add_children([
+            )
+            step_cannot_enter.add_children([
                 a.MovingAction(
                     name="Calling the nurse",
                     planner=self,
@@ -102,7 +104,8 @@ class Planner:
                 ),
             ]),
 
-            patient_items = get_items_from_patient_configuration(p.patientConfiguration)
+            patient_items = get_items_from_patient_configuration(
+                p.patientConfiguration)
             if patient_items['autonomy_rule_accept_health_status_check'] is not None and patient_items['autonomy_rule_accept_health_status_check'].value:
                 step2 = py_trees.composites.Sequence(
                     "Step 2 " + p.name,
@@ -112,7 +115,7 @@ class Planner:
                     step3 = py_trees.composites.Sequence(
                         "Step 3 " + p.name,
                         memory=True,
-                    ).add_children(
+                    ).add_children([
                         a.ExecutionAction(
                             name=p.name + " legal guardian answered",
                             onComplete=lambda: (),
@@ -136,8 +139,8 @@ class Planner:
                             planner=self,
                             target=self.robot.base
                         ),
-                    )
-                    step2.add_children(
+                    ])
+                    step2.add_children([
                         a.ExecutionAction(
                             name="Calling " + p.name + " legal guardian",
                             onComplete=lambda: (
@@ -148,7 +151,7 @@ class Planner:
                             ),
                         ),
                         py_trees.idioms.either_or(
-                            name="Check health status 3",
+                            name="Guardian Answered",
                             conditions=[
                                 py_trees.common.ComparisonExpression(
                                     p.name.lower()+"_guardian_answered", True, operator.eq),
@@ -157,43 +160,42 @@ class Planner:
                             ],
                             subtrees=[
                                 step3,
-                                step_cannot_enter,
+                                copy.copy(step_cannot_enter),
                             ],
-                            namespace=p.name.lower()+"_either_or",
                         ),
-                    )
+                    ])
                 else:
-                    step2 = step_cannot_enter
-                
+                    step2 = copy.copy(step_cannot_enter)
+
                 if patient_items['privacy_rule_accept_recording'] is not None and patient_items['privacy_rule_accept_recording'].value == True:
                     step_can_enter.add_child(
                         a.ExecutionAction(
-                        name=f"Check if {p.name} is in Toilet",
-                        onComplete=lambda: (
-                            self.robot.stopRecording(random.randint(0, 1))
-                        ),
-                    ))
-                    
+                            name=f"Check if {p.name} is in Toilet",
+                            onComplete=lambda: (
+                                self.robot.stopRecording(random.randint(0, 1))
+                            ),
+                        ))
+
                 if patient_items['autonomy_rule_accept_medication_reminder'] is not None and patient_items['autonomy_rule_accept_medication_reminder'].value == True:
                     step_can_enter.insert_child(
                         a.ExecutionAction(
-                        name=f"Check if {p.name} is in Toilet",
-                        onComplete=lambda: (
-                            self.robot.stopRecording(random.randint(0, 1))
-                        ),
-                    ), 4) 
-                    
+                            name=f"Check if {p.name} is in Toilet",
+                            onComplete=lambda: (
+                                self.robot.stopRecording(random.randint(0, 1))
+                            ),
+                        ), 4)
+
                 if patient_items['autonomy_exception_enough_repetition'] is not None:
                     step_can_enter.insert_child(
                         a.ExecutionAction(
-                        name=f"Enough repetitions...",
-                        onComplete=lambda: (
-                            self.robot.stopRecording(random.randint(0, 1))
+                            name=f"Enough repetitions...",
+                            onComplete=lambda: (
+                                self.robot.stopRecording(random.randint(0, 1))
+                            ),
                         ),
-                    ), TODO)   
-                    
+                    )
+
                 step_can_enter.add_children([
-                    
                     a.MovingAction(
                         name="Check health status 1",
                         planner=self,
@@ -219,9 +221,8 @@ class Planner:
                         ],
                         subtrees=[
                             step2,
-                            step_cannot_enter,
+                            copy.copy(step_cannot_enter),
                         ],
-                        namespace=p.name.lower()+"_either_or",
                     ),
                     a.MovingAction(
                         name="Give pill to " + p.name,
@@ -281,9 +282,8 @@ class Planner:
                     ],
                     subtrees=[
                         step_can_enter,
-                        step_cannot_enter,
+                        copy.copy(step_cannot_enter),
                     ],
-                    namespace=p.name.lower()+"_either_or",
                 ),
             ])
             start_root.add_children([self.robot.patientPlan[p]])
