@@ -102,8 +102,7 @@ class Planner:
                 ),
             ]),
 
-            patient_items = get_items_from_patient_configuration(
-                p.patientConfiguration)
+            patient_items = get_items_from_patient_configuration(p.patientConfiguration)
             if patient_items['autonomy_rule_accept_health_status_check'] is not None and patient_items['autonomy_rule_accept_health_status_check'].value:
                 step2 = py_trees.composites.Sequence(
                     "Step 2 " + p.name,
@@ -165,7 +164,18 @@ class Planner:
                     )
                 else:
                     step2 = step_cannot_enter
+                
+                if patient_items['privacy_rule_accept_recording'] is not None and patient_items['privacy_rule_accept_recording'].value == True:
+                    step_can_enter.add_children([
+                        a.ExecutionAction(
+                        name=f"Check if {p.name} is in Toilet",
+                        onComplete=lambda: (
+                            self.robot.stopRecording(random.randint(0, 1))
+                        ),
+                    )])
+                    
                 step_can_enter.add_children([
+                    
                     a.MovingAction(
                         name="Check health status 1",
                         planner=self,
@@ -218,8 +228,7 @@ class Planner:
             patient_items['dignity_rule_accept_ambulatory_support']
             patient_items['autonomy_rule_accept_medication_reminder']
             patient_items['autonomy_exception_enough_repetition']
-            patient_items['privacy_exception_patient_is_in_toilet']
-            patient_items['privacy_exception_data_is_health_sensitive']
+            """ patient_items['privacy_exception_data_is_health_sensitive'] """
 
             self.robot.patientPlan[p] = py_trees.composites.Sequence(
                 "Visiting " + p.name,
