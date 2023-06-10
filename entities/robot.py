@@ -29,6 +29,34 @@ class Robot:
         self.base = self.world.robotBaseCoords()
         self.planner = Planner(self)
         self.patientPlan = dict()
+        self.recording = True
+        self.distribution = True
+        self.storage = True
+
+    def configureSensorAccordingPatientPrivacy(self, items):
+        if items['privacy_rule_accept_recording'] is not None:
+            self.recording = items['privacy_rule_accept_recording']
+        else:
+            self.recording = True
+
+        if items['privacy_rule_accept_distribution'] is not None:
+            self.distribution = items['privacy_rule_accept_distribution']
+        else:
+            self.distribution = True
+
+        if items['privacy_rule_accept_storage'] is not None:
+            self.storage = items['privacy_rule_accept_storage']
+        else:
+            self.storage = True
+
+    def setRecording(self, recording):
+        self.recording = recording
+
+    def setDistribution(self, distribution):
+        self.distribution = distribution
+
+    def setStorage(self, storage):
+        self.storage = storage
 
     def setStatus(self, text):
         self.status = text
