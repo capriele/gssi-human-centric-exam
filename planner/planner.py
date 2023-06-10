@@ -166,13 +166,31 @@ class Planner:
                     step2 = step_cannot_enter
                 
                 if patient_items['privacy_rule_accept_recording'] is not None and patient_items['privacy_rule_accept_recording'].value == True:
-                    step_can_enter.add_children([
+                    step_can_enter.add_child(
                         a.ExecutionAction(
                         name=f"Check if {p.name} is in Toilet",
                         onComplete=lambda: (
                             self.robot.stopRecording(random.randint(0, 1))
                         ),
-                    )])
+                    ))
+                    
+                if patient_items['autonomy_rule_accept_medication_reminder'] is not None and patient_items['autonomy_rule_accept_medication_reminder'].value == True:
+                    step_can_enter.insert_child(
+                        a.ExecutionAction(
+                        name=f"Check if {p.name} is in Toilet",
+                        onComplete=lambda: (
+                            self.robot.stopRecording(random.randint(0, 1))
+                        ),
+                    ), 4) 
+                    
+                if patient_items['autonomy_exception_enough_repetition'] is not None:
+                    step_can_enter.insert_child(
+                        a.ExecutionAction(
+                        name=f"Enough repetitions...",
+                        onComplete=lambda: (
+                            self.robot.stopRecording(random.randint(0, 1))
+                        ),
+                    ), TODO)   
                     
                 step_can_enter.add_children([
                     

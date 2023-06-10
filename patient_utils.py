@@ -50,6 +50,5 @@ def get_items_from_patient_configuration(configuration):
     items['privacy_rule_accept_distribution'] = privacy_accept_distribution_rule
     items['privacy_rule_accept_storage'] = privacy_accept_storage_rule
     items['privacy_exception_data_is_health_sensitive'] = privacy_data_is_health_sensitive_exception
-    items['dignity_rule_accept_ambulatory_support'] = dignity_accept_ambulatory_support_rule
     
     return items
