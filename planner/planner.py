@@ -24,6 +24,8 @@ class Planner:
         self.blackboard = py_trees.blackboard.Blackboard()
         for p in self.robot.world.patientsList():
             self.blackboard.set(p.name.lower()+"_can_enter", False)
+            self.blackboard.set(p.name.lower()+"_has_distress", False)
+            self.blackboard.set(p.name.lower()+"_guardian_answered", False)
 
     def reset(self):
         # Standard steps
@@ -82,14 +84,20 @@ class Planner:
             poichè solamente quando interagisco con l'utente posso capire come comportarmi.
             '''
             step_can_enter = py_trees.composites.Sequence(
-                "Entering " + p.name,
+                p.name + " can enter",
                 memory=True,
             )
             step_cannot_enter = py_trees.composites.Sequence(
-                "Visiting " + p.name,
+                p.name + " cannot enter",
                 memory=True,
             )
             step_cannot_enter.add_children([
+                a.MovingAction(
+                    name="Calling the nurse",
+                    planner=self,
+                    patient=p,
+                    target=p.room.door,
+                ),
                 a.MovingAction(
                     name="Calling the nurse",
                     planner=self,
@@ -106,7 +114,7 @@ class Planner:
 
             patient_items = get_items_from_patient_configuration(
                 p.patientConfiguration)
-            if patient_items['autonomy_rule_accept_health_status_check'] is not None and patient_items['autonomy_rule_accept_health_status_check'].value:
+            if patient_items['autonomy_rule_accept_health_status_check'] is not None and patient_items['autonomy_rule_accept_health_status_check'].value == "true":
                 step2 = py_trees.composites.Sequence(
                     "Step 2 " + p.name,
                     memory=True,
@@ -116,14 +124,6 @@ class Planner:
                         "Step 3 " + p.name,
                         memory=True,
                     ).add_children([
-                        a.ExecutionAction(
-                            name=p.name + " legal guardian answered",
-                            onComplete=lambda: (),
-                        ),
-                        a.ExecutionAction(
-                            name=p.name + " legal guardian answered",
-                            onComplete=lambda: (),
-                        ),
                         a.ExecutionAction(
                             name=p.name + " legal guardian answered",
                             onComplete=lambda: (),
@@ -140,61 +140,43 @@ class Planner:
                             target=self.robot.base
                         ),
                     ])
-                    step2.add_children([
-                        a.ExecutionAction(
-                            name="Calling " + p.name + " legal guardian",
-                            onComplete=lambda: (
-                                self.blackboard.set(
-                                    p.name.lower()+"_guardian_answered",
-                                    random.randint(0, 1) == 1
-                                )
-                            ),
-                        ),
-                        py_trees.idioms.either_or(
-                            name="Guardian Answered",
-                            conditions=[
-                                py_trees.common.ComparisonExpression(
-                                    p.name.lower()+"_guardian_answered", True, operator.eq),
-                                py_trees.common.ComparisonExpression(
-                                    p.name.lower()+"_guardian_answered", False, operator.eq),
-                            ],
-                            subtrees=[
-                                step3,
-                                copy.copy(step_cannot_enter),
-                            ],
-                        ),
-                    ])
                 else:
                     step2 = copy.copy(step_cannot_enter)
 
-                if patient_items['privacy_rule_accept_recording'] is not None and patient_items['privacy_rule_accept_recording'].value == True:
+            if patient_items['privacy_rule_accept_recording'] is not None and patient_items['privacy_rule_accept_recording'].value == "true":
+                if patient_items['privacy_exception_patient_is_in_toilet'] is not None:
                     step_can_enter.add_child(
                         a.ExecutionAction(
                             name=f"Check if {p.name} is in Toilet",
                             onComplete=lambda: (
-                                self.robot.stopRecording(random.randint(0, 1))
+                                self.robot.setRecording(random.randint(0, 1)==1)
                             ),
                         ))
 
-                if patient_items['autonomy_rule_accept_medication_reminder'] is not None and patient_items['autonomy_rule_accept_medication_reminder'].value == True:
-                    step_can_enter.insert_child(
-                        a.ExecutionAction(
-                            name=f"Check if {p.name} is in Toilet",
-                            onComplete=lambda: (
-                                self.robot.stopRecording(random.randint(0, 1))
-                            ),
-                        ), 4)
+            if patient_items['autonomy_rule_accept_medication_reminder'] is not None and patient_items['autonomy_rule_accept_medication_reminder'].value == "true":
+                def add_pill_reminder(force):
+                    if force:
+                        step_can_enter.add_child(
+                            a.ExecutionAction(
+                                name=f"{p.name}, you should take the pill!",
+                                onComplete=lambda: (),
+                            )
+                        )
+                add_pill_reminder(force=True)
 
                 if patient_items['autonomy_exception_enough_repetition'] is not None:
-                    step_can_enter.insert_child(
+                    step_can_enter.add_child(
                         a.ExecutionAction(
                             name=f"Enough repetitions...",
                             onComplete=lambda: (
-                                self.robot.stopRecording(random.randint(0, 1))
+                                add_pill_reminder(force=(random.randint(0, 1)==1))
                             ),
                         ),
                     )
 
+            print("patient_items['dignity_rule_accept_ambulatory_support'].value")
+            print(patient_items['dignity_rule_accept_ambulatory_support'].value)
+            if patient_items['dignity_rule_accept_ambulatory_support'] is not None and patient_items['dignity_rule_accept_ambulatory_support'].value == "true":
                 step_can_enter.add_children([
                     a.MovingAction(
                         name="Check health status 1",
@@ -208,81 +190,115 @@ class Planner:
                             self.blackboard.set(
                                 p.name.lower()+"_has_distress",
                                 random.randint(0, 1) == 1
-                            )
+                            ),
                         ),
                     ),
                     py_trees.idioms.either_or(
                         name="Check health status 3",
                         conditions=[
-                            py_trees.common.ComparisonExpression(
-                                p.name.lower()+"_has_distress", False, operator.eq),
-                            py_trees.common.ComparisonExpression(
-                                p.name.lower()+"_has_distress", True, operator.eq),
+                            py_trees.common.ComparisonExpression(p.name.lower()+"_has_distress", False, operator.eq),
+                            py_trees.common.ComparisonExpression(p.name.lower()+"_has_distress", True, operator.eq),
                         ],
                         subtrees=[
-                            step2,
-                            copy.copy(step_cannot_enter),
+                            py_trees.composites.Sequence(
+                                p.name + " not stressed",
+                                memory=True,
+                            ).add_children([
+                                a.MovingAction(
+                                    name="Give pill to " + p.name,
+                                    planner=self,
+                                    patient=p,
+                                    target=p.position,
+                                ),
+                                a.ExecutionAction(
+                                    name=p.name + " takes the pill",
+                                    onComplete=lambda: (
+                                        self.robot.decreasePills(),
+                                    ),
+                                ),
+                                a.MovingAction(
+                                    name="Exiting from " + p.name + " Room",
+                                    planner=self,
+                                    patient=p,
+                                    target=p.room.door,
+                                ),
+                            ]),
+                            py_trees.composites.Sequence(
+                                p.name + " stressed",
+                                memory=True,
+                            ).add_children([
+                                a.ExecutionAction(
+                                    name="Check Legal Guardian",
+                                    onComplete=lambda: (
+                                        step2.add_children([
+                                            a.ExecutionAction(
+                                                name="Calling " + p.name + " legal guardian",
+                                                onComplete=lambda: (
+                                                    self.blackboard.set(
+                                                        p.name.lower()+"_guardian_answered",
+                                                        random.randint(0, 1) == 1
+                                                    )
+                                                ),
+                                            ),
+                                            py_trees.idioms.either_or(
+                                                name="Guardian Answered",
+                                                conditions=[
+                                                    py_trees.common.ComparisonExpression(
+                                                        p.name.lower()+"_guardian_answered", True, operator.eq),
+                                                    py_trees.common.ComparisonExpression(
+                                                        p.name.lower()+"_guardian_answered", False, operator.eq),
+                                                ],
+                                                subtrees=[
+                                                    step3,
+                                                    copy.copy(step_cannot_enter),
+                                                ],
+                                            ),
+                                        ])
+                                    ),
+                                ),
+                            ]),
                         ],
                     ),
-                    a.MovingAction(
-                        name="Give pill to " + p.name,
-                        planner=self,
-                        patient=p,
-                        target=p.position,
-                    ),
-                    a.ExecutionAction(
-                        name=p.name + " takes the pill",
-                        onComplete=lambda: (
-                            self.robot.decreasePills(),
-                        ),
-                    ),
-                    a.MovingAction(
-                        name="Exiting from " + p.name + " Room",
-                        planner=self,
-                        patient=p,
-                        target=p.room.door,
-                    ),
+                    copy.copy(step2),
                 ]),
 
-            if patient_items['dignity_rule_accept_ambulatory_support'] is not None and patient_items['dignity_rule_accept_ambulatory_support'].value:
-                self.robot.patientPlan[p] = py_trees.composites.Sequence(
-                    "Visiting " + p.name,
-                    memory=True,
-                ).add_children([
-                    a.MovingAction(
-                        name="Going to " + p.name + " Room",
-                        planner=self,
-                        patient=p,
-                        target=p.room.door,
+            self.robot.patientPlan[p] = py_trees.composites.Sequence(
+                "Visiting " + p.name,
+                memory=True,
+            ).add_children([
+                a.MovingAction(
+                    name="Going to " + p.name + " Room",
+                    planner=self,
+                    patient=p,
+                    target=p.room.door,
+                ),
+                a.ExecutionAction(
+                    name="Process " + p.name + " privacy rules",
+                    onComplete=lambda: (
+                        self.robot.configureSensorAccordingPatientPrivacy(patient_items),
                     ),
-                    a.ExecutionAction(
-                        name="Process " + p.name + " privacy rules",
-                        onComplete=lambda: (
-                            self.robot.configureSensorAccordingPatientPrivacy(
-                                patient_items),
-                        ),
-                    ),
-                    a.InteractionAction(
-                        name=p.name + ", can I enter?",
-                        planner=self,
-                        patient=p,
-                        onComplete=lambda: (),
-                    ),
-                    py_trees.idioms.either_or(
-                        name="Interacting with " + p.name,
-                        conditions=[
-                            py_trees.common.ComparisonExpression(
-                                p.name.lower()+"_can_enter", True, operator.eq),
-                            py_trees.common.ComparisonExpression(
-                                p.name.lower()+"_can_enter", False, operator.eq),
-                        ],
-                        subtrees=[
-                            step_can_enter,
-                            copy.copy(step_cannot_enter),
-                        ],
-                    ),
-                ])
-                start_root.add_children([self.robot.patientPlan[p]])
+                ),
+                a.InteractionAction(
+                    name=p.name + ", can I enter?",
+                    planner=self,
+                    patient=p,
+                    onComplete=lambda: (),
+                ),
+                py_trees.idioms.either_or(
+                    name="Interacting with " + p.name,
+                    conditions=[
+                        py_trees.common.ComparisonExpression(
+                            p.name.lower()+"_can_enter", True, operator.eq),
+                        py_trees.common.ComparisonExpression(
+                            p.name.lower()+"_can_enter", False, operator.eq),
+                    ],
+                    subtrees=[
+                        step_can_enter,
+                        copy.copy(step_cannot_enter),
+                    ],
+                ),
+            ])
+            start_root.add_children([self.robot.patientPlan[p]])
 
         # Standard steps
         start_root.add_children([
@@ -336,7 +352,7 @@ class Planner:
             try:
                 self.behaviour_tree.tick(
                     pre_tick_handler=None,
-                    post_tick_handler=print_tree
+                    #post_tick_handler=print_tree
                 )
                 self.currentStep = self.behaviour_tree.tip()
                 if self.currentStep:
