@@ -15,9 +15,9 @@ With its capabilities, the model holds immense potential for facilitating compre
 
 # Professors
 
-* Martina De Sanctis <martina.desanctis@gssi.it>,
-* Paola Inverardi <paola.inverardi@gssi.it>,
-* Ludovico Iovino <ludovico.iovino@gssi.it>,
+* Martina De Sanctis <martina.desanctis@gssi.it>
+* Paola Inverardi <paola.inverardi@gssi.it>
+* Ludovico Iovino <ludovico.iovino@gssi.it>
 * Patrizio Pelliccione <patrizio.pelliccione@gssi.it>
 
 # Installation
@@ -43,7 +43,7 @@ python -X utf8 game.py
 
 # Update configuration.py and patient.py
 
-`patient.py` and  `robot.py` are auto-generated with generateDS: https://github.com/ricksladkey/generateDS .
+`patient.py` and  `robot.py` are auto-generated with generateDS:
 
 To re-generate them after a change of `schema_configuration.xsd`:
 
@@ -55,17 +55,20 @@ python $PATH$/generateDS.py -o robot.py schemas/robot.xsd
 python $PATH$/generateDS.py -o patient.py schemas/patient.xsd
 ```
 
-## ToDo List
+# Technicalities
+The software is written in Python 3 and utilizes the following libraries:
 
-- [x] Implement a basic simulator of the scenario
-- [x] Implement robot daily job using behavioural trees
-- [x] Implement User-Robot interaction throught keyboard
-- [x] Implement PathPlanner, Verificator and Conditioner
-- [x] Load user from XML
-- [x] Automatically generate map from XML
-- [x] Configure robot daily plan according patients XML (use patientConfiguration attribute)
+* PyTrees: PyTrees is a versatile Python library for working with tree-based data structures. It provides a comprehensive set of functionalities for creating, managing, and analyzing hierarchical data representations. With support for tree traversal algorithms and customizable behaviors, PyTrees offers efficient solutions for tree-related tasks.
 
-## Exam Solution
+* Ursina: Ursina is a lightweight game development framework for Python. It simplifies the process of creating interactive 2D and 3D applications by providing a user-friendly API and a range of built-in components. With its intuitive design and extensive documentation, Ursina enables developers to quickly prototype and develop immersive graphical experiences.
+
+* Robotics Toolbox Python: The Robotics Toolbox Python is a library designed for robotic applications and research. It offers a wide range of tools and algorithms for robot kinematics, dynamics, control, and visualization. With its comprehensive collection of functions, the Robotics Toolbox Python facilitates the development and analysis of robotic systems in various domains.
+
+* generateDS: generateDS is a Python library that simplifies the process of generating Python data structures (classes) from XML and XSD (XML Schema Definition) files. It automatically generates Python classes that correspond to the defined elements and attributes in the XML and XSD schemas. This library streamlines the integration of XML data into Python programs, making it easier to process and manipulate structured data.
+
+By leveraging these libraries, the software benefits from enhanced capabilities in managing tree-based data structures, creating interactive graphical interfaces, and implementing advanced robotics functionalities.
+
+# Exam Solution
 This software simulate in a 3D environment three human profiles (Bob, Alice and Nurse) and a robot that interacts with these characters and move inside the clinic. 
 In particular we implemented the following profiles for Bob and Alice.
 - Bob profile: If I will refuse the medications or to take pills, it is fine that the robot insists a few times. However, after a few attempts it should call the nurse. I accept that the robot uses cameras and microphones, however all my data cannot be distributed to third parties. Moreover, the robot can only store and/or distribute to the nurse videos and audios that are strictly necessary for my health, and in any case videos cannot be recorded in the toilet.
@@ -73,15 +76,16 @@ In particular we implemented the following profiles for Bob and Alice.
 
 In order to simulate human emotions we simply press a specific key on the keyboard.
 
-### Robot daily job
+## Robot daily job
 PyTrees is a Python library for working with tree-based data structures. It provides powerful functionalities for creating, manipulating, and analyzing trees. With support for tree traversal algorithms and customizable behaviors, PyTrees enables efficient management of hierarchical data representations.
 
 The image below summarize all the tasks that the robot will daily execute in a behavioural tree implemented in PyTrees.
 ![Robot daily job](./images/daily_jobs.png)
 
-## Useful references
+# Useful references
 - [Ursina](https://www.ursinaengine.org/)
 - [Robotics Toolbox Python](https://petercorke.github.io/robotics-toolbox-python)
+- [GenerateDS]( https://github.com/ricksladkey/generateDS)
 - [Bug2 Planner](https://automaticaddison.com/the-bug2-algorithm-for-robot-motion-planning/)
 - [Distance transform: Base](https://robotics102.github.io/lectures/rob102_07_distance_transform.pdf)
 - [Distance transform: Potential fields](https://robotics102.github.io/lectures/rob102_08_potential_field.pdf)
