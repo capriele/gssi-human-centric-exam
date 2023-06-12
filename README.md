@@ -1,5 +1,7 @@
 # Introduction
 
+![Software](screenshots/screen.jpg)
+
 The software presents a cutting-edge implementation of a highly customizable model, designed specifically to address and explore the intricate aspects associated with automation and ethical considerations within the realm of computer science. By leveraging its sophisticated framework, this software enables in-depth analysis and management of the complex interplay between automated systems and ethical dimensions.
 
 To ensure the utmost integrity and reliability, the software offers two meticulously crafted XSD schemas that serve as robust tools for validating the intricate configurations of both the robot and the individual patient. These schemas act as invaluable resources, ensuring that the specified parameters adhere to predefined standards, thus guaranteeing a coherent and compliant setup.
@@ -66,7 +68,7 @@ The software is written in Python 3 and utilizes the following libraries:
 
 * generateDS: generateDS is a Python library that simplifies the process of generating Python data structures (classes) from XML and XSD (XML Schema Definition) files. It automatically generates Python classes that correspond to the defined elements and attributes in the XML and XSD schemas. This library streamlines the integration of XML data into Python programs, making it easier to process and manipulate structured data.
 
-By leveraging these libraries, the software benefits from enhanced capabilities in managing tree-based data structures, creating interactive graphical interfaces, and implementing advanced robotics functionalities.
+By leveraging these libraries, the software benefits from enhanced capabilities in managing tree-based data structures, creating interactive graphical interfaces, implementing advanced robotics functionalities, and seamlessly integrating XML data processing into Python applications.
 
 # Exam Solution
 This software simulate in a 3D environment three human profiles (Bob, Alice and Nurse) and a robot that interacts with these characters and move inside the clinic. 
@@ -81,6 +83,10 @@ PyTrees is a Python library for working with tree-based data structures. It prov
 
 The image below summarize all the tasks that the robot will daily execute in a behavioural tree implemented in PyTrees.
 ![Robot daily job](./images/daily_jobs.png)
+
+## Screenshots
+
+
 
 # Useful references
 - [Ursina](https://www.ursinaengine.org/)
