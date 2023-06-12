@@ -23,13 +23,13 @@ With its capabilities, the model holds immense potential for facilitating compre
 * Patrizio Pelliccione <patrizio.pelliccione@gssi.it>
 
 # Installation
-On Windows:
+For Windows:
 
 ```
 pip install -r requirements_windows.txt
 ```
 
-On MacOS
+For MacOS
 
 ```
 pip install -r requirements_macos.txt
@@ -45,9 +45,7 @@ python -X utf8 game.py
 
 # Update configuration.py and patient.py
 
-`patient.py` and  `robot.py` are auto-generated with generateDS:
-
-To re-generate them after a change of `schema_configuration.xsd`:
+The `patient.py` and `robot.py` files are auto-generated using generateDS. To re-generate them after making changes to schema_configuration.xsd, use the following commands:
 
 ```bash
 python $PATH$/generateDS.py -o robot.py schemas/robot.xsd
