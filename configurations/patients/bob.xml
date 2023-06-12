@@ -29,7 +29,7 @@
       </rule>
     </privacy>
     <dignity>
-      <rule name="accept_ambulatory_support" value="false" />
+      <rule name="accept_ambulatory_support" value="true" />
     </dignity>
   </ethics>
 </patient>
