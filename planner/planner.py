@@ -93,7 +93,7 @@ class Planner:
             )
             step_cannot_enter.add_children([
                 a.MovingAction(
-                    name="Calling the nurse",
+                    name="Leaving " + p.name,
                     planner=self,
                     patient=p,
                     target=p.room.door,
