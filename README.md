@@ -1,4 +1,26 @@
-## Installation
+# Introduction
+
+The software presents a cutting-edge implementation of a highly customizable model, designed specifically to address and explore the intricate aspects associated with automation and ethical considerations within the realm of computer science. By leveraging its sophisticated framework, this software enables in-depth analysis and management of the complex interplay between automated systems and ethical dimensions.
+
+To ensure the utmost integrity and reliability, the software offers two meticulously crafted XSD schemas that serve as robust tools for validating the intricate configurations of both the robot and the individual patient. These schemas act as invaluable resources, ensuring that the specified parameters adhere to predefined standards, thus guaranteeing a coherent and compliant setup.
+
+Significantly, this software can be envisaged as the foundational architectural prototype, establishing a solid groundwork upon which further advancements, configurations, and refinements can be built. By providing a flexible and adaptable framework, it allows for seamless evolution and intricacy within the proposed scenario, accommodating diverse requirements and fostering innovation in the field.
+
+With its capabilities, the model holds immense potential for facilitating comprehensive simulations and meticulous verification of the robot's programming. This empowers researchers and practitioners to scrutinize and fine-tune the intricacies of the robot's behavior, meticulously aligning it with ethical, privacy, and patient dignity principles. By striving to ensure that these essential values are upheld, the software actively contributes to creating a responsible and humane technological ecosystem.
+
+# Authors
+
+* Andrea de Ruvo, andrea.deruvo@gssi.it
+* Alberto Petrucci, alberto.petrucci@gssi.it
+
+# Professors
+
+* Martina De Sanctis <martina.desanctis@gssi.it>,
+* Paola Inverardi <paola.inverardi@gssi.it>,
+* Ludovico Iovino <ludovico.iovino@gssi.it>,
+* Patrizio Pelliccione <patrizio.pelliccione@gssi.it>
+
+# Installation
 On Windows:
 
 ```
@@ -11,7 +33,7 @@ On MacOS
 pip install -r requirements_macos.txt
 ```
 
-## Launching
+# Launching
 
 To launch the software and ensure UTF-8 encoding is used for both input and output, you can run the following command:
 
@@ -19,14 +41,18 @@ To launch the software and ensure UTF-8 encoding is used for both input and outp
 python -X utf8 game.py
 ```
 
-## Generate configuration.py
+# Update configuration.py and patient.py
 
-`configuration.py` is auto-generated with generateDS: https://github.com/ricksladkey/generateDS .
+`patient.py` and  `robot.py` are auto-generated with generateDS: https://github.com/ricksladkey/generateDS .
 
-To re-generate `configuration.py` after a change of `schema_configuration.xsd`:
+To re-generate them after a change of `schema_configuration.xsd`:
 
 ```bash
-python $PATH$/generateDS.py -o configuration.py configuration/schema_configuration.xsd
+python $PATH$/generateDS.py -o robot.py schemas/robot.xsd
+```
+
+```bash
+python $PATH$/generateDS.py -o patient.py schemas/patient.xsd
 ```
 
 ## ToDo List
@@ -37,7 +63,7 @@ python $PATH$/generateDS.py -o configuration.py configuration/schema_configurati
 - [x] Implement PathPlanner, Verificator and Conditioner
 - [x] Load user from XML
 - [x] Automatically generate map from XML
-- [ ] Configure robot daily plan according patients XML (use patientConfiguration attribute)
+- [x] Configure robot daily plan according patients XML (use patientConfiguration attribute)
 
 ## Exam Solution
 This software simulate in a 3D environment three human profiles (Bob, Alice and Nurse) and a robot that interacts with these characters and move inside the clinic. 
@@ -48,10 +74,12 @@ In particular we implemented the following profiles for Bob and Alice.
 In order to simulate human emotions we simply press a specific key on the keyboard.
 
 ### Robot daily job
-The image below summarize all the tasks that the robot will daily execute in a behavioural tree.
+PyTrees is a Python library for working with tree-based data structures. It provides powerful functionalities for creating, manipulating, and analyzing trees. With support for tree traversal algorithms and customizable behaviors, PyTrees enables efficient management of hierarchical data representations.
+
+The image below summarize all the tasks that the robot will daily execute in a behavioural tree implemented in PyTrees.
 ![Robot daily job](./images/daily_jobs.png)
 
-## Useful links:
+## Useful references
 - [Ursina](https://www.ursinaengine.org/)
 - [Robotics Toolbox Python](https://petercorke.github.io/robotics-toolbox-python)
 - [Bug2 Planner](https://automaticaddison.com/the-bug2-algorithm-for-robot-motion-planning/)
