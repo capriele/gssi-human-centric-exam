@@ -12,15 +12,15 @@ With its capabilities, the model holds immense potential for facilitating compre
 
 # Authors
 
-* Andrea de Ruvo, andrea.deruvo@gssi.it
-* Alberto Petrucci, alberto.petrucci@gssi.it
+* Andrea de Ruvo, <andrea.deruvo@gssi.it>
+* Alberto Petrucci, <alberto.petrucci@gssi.it>
 
 # Professors
 
-* Martina De Sanctis <martina.desanctis@gssi.it>
-* Paola Inverardi <paola.inverardi@gssi.it>
-* Ludovico Iovino <ludovico.iovino@gssi.it>
-* Patrizio Pelliccione <patrizio.pelliccione@gssi.it>
+* Martina De Sanctis, <martina.desanctis@gssi.it>
+* Paola Inverardi, <paola.inverardi@gssi.it>
+* Ludovico Iovino, <ludovico.iovino@gssi.it>
+* Patrizio Pelliccione, <patrizio.pelliccione@gssi.it>
 
 # Installation
 For Windows:
