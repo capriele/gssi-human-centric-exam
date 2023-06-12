@@ -82,10 +82,6 @@ PyTrees is a Python library for working with tree-based data structures. It prov
 The image below summarize all the tasks that the robot will daily execute in a behavioural tree implemented in PyTrees.
 ![Robot daily job](./images/daily_jobs.png)
 
-## Screenshots
-
-
-
 # Useful references
 - [Ursina](https://www.ursinaengine.org/)
 - [Robotics Toolbox Python](https://petercorke.github.io/robotics-toolbox-python)
