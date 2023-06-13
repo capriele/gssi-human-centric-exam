@@ -10,6 +10,12 @@ Significantly, this software can be envisaged as the foundational architectural 
 
 With its capabilities, the model holds immense potential for facilitating comprehensive simulations and meticulous verification of the robot's programming. This empowers researchers and practitioners to scrutinize and fine-tune the intricacies of the robot's behavior, meticulously aligning it with ethical, privacy, and patient dignity principles. By striving to ensure that these essential values are upheld, the software actively contributes to creating a responsible and humane technological ecosystem.
 
+The environment is fully configurable via XML files. For example you can add a new patient with the following steps:
+- create the patient XML under configurations/patients
+- add the patient's room inside configurations/robots/robot.xml
+- check that the room ID is the same in both patient and robot XMLs
+![Software](screenshots/screen_2.png)
+
 # Authors
 
 * Andrea de Ruvo, <andrea.deruvo@gssi.it>
