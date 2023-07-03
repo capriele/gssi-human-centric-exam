@@ -4,7 +4,9 @@ class Constants:
 
     SCHEMA_XSD_ROBOT = "./schemas/robot.xsd"
     SCHEMA_XSD_PATIENT = "./schemas/patient.xsd"
+    SCHEMA_XSD_HOSPITAL = "./schemas/hospital.xsd"
     ROBOTS_CONFIGURATION_FOLDER = "./configurations/robots"
+    HOSPITAL_CONFIGURATION_FOLDER = "./configurations/hospital"
     PATIENTS_CONFIGURATION_FOLDER = "./configurations/patients"
 
     ROBOT_INITIAL_NUMBER_OF_PILLS = 0

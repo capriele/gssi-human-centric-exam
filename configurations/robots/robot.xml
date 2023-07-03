@@ -4,13 +4,11 @@
     <name>Robot_1</name>
     <color>#FFA500</color>
     <description>Description 1</description>
-
     <properties>
         <property key="patient_humor" from="1" to="10"></property>
         <property key="patient_humor_good" from="6" to="10"></property>
         <property key="patient_humor_bad" from="1" to="5"></property>
     </properties>
-
     <behaviours>
         <behaviour key="if_patient_humor_good" value="4">
         </behaviour>

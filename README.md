@@ -52,16 +52,16 @@ To launch the software and ensure UTF-8 encoding is used for both input and outp
 python -X utf8 game.py
 ```
 
-# Update robot.py and patient.py
+# Update generated entities
 
-The `patient.py` and `robot.py` files are auto-generated using generateDS. To re-generate them after making changes to schema_configuration.xsd, use the following commands:
+The `patient.py`, `robot.py` and `hospital.py` files in the `generated` folder are auto-generated using generateDS. To re-generate them after making changes to schema_configuration.xsd, use the following commands:
 
 ```bash
-python $PATH$/generateDS.py -o robot.py schemas/robot.xsd
+python $PATH$/generateDS.py -o generated/robot.py schemas/robot.xsd
 ```
 
 ```bash
-python $PATH$/generateDS.py -o patient.py schemas/patient.xsd
+python $PATH$/generateDS.py -o generated/patient.py schemas/patient.xsd
 ```
 
 # Technicalities

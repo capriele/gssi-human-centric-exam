@@ -3,17 +3,18 @@ from configurer import Configurer
 from constants import Constants
 from logger import Logger
 from entities import *
-import robot
-import patient
+import generated.robot as robot
+import generated.patient as patient
+import generated.hospital as hospital
 import threading
 import time
 import os
-
 
 class WorldCreator:
     def __init__(
         self,
         robot,
+        hospital,
         roomSize=(150, 200),
         doorSize=65,
         wallTickness=1,
@@ -23,7 +24,9 @@ class WorldCreator:
         rooms_id = []
         rooms_name = []
         rooms_color = []
-        for r in robot.get_hospital().get_rooms().get_room():
+        
+        
+        for r in hospital.get_rooms().get_room():
             rooms_id.append(r.get_id())
             rooms_name.append(r.get_name())
             rooms_color.append(r.get_color())
@@ -123,7 +126,7 @@ class WorldCreator:
                 Room(
                     id=rooms_id[i],
                     name=rooms_name[i],
-                    door=door,
+                        door=door,
                     door_polygon=door_polygon,
                     polygon=room_polygon,
                     color=rooms_color[i],
@@ -158,9 +161,16 @@ robot_configuration = robot_configurer.load(
 
 patient_configurer = Configurer(Constants.SCHEMA_XSD_PATIENT)
 
+hospital_configurer = Configurer(Constants.SCHEMA_XSD_HOSPITAL)
+hospital_configuration =  hospital_configurer.load(
+    os.path.join(Constants.HOSPITAL_CONFIGURATION_FOLDER,
+                 "hospital.xml"), hospital.parse
+)
+
 scale = 0.1
 wc = WorldCreator(
     robot=robot_configuration,
+    hospital=hospital_configuration,
     scale=scale,
 )
 app = Ursina(size=(wc.map.shape[0], wc.map.shape[1] * 2))

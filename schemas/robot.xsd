@@ -7,27 +7,6 @@
         <xs:element type="xs:string" name="name"/>
         <xs:element type="xs:string" name="color"/>
         <xs:element type="xs:string" name="description"/>
-        <xs:element name="hospital">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="rooms">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element name="room" maxOccurs="unbounded" minOccurs="0">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element type="xs:int" name="id"/>
-                          <xs:element type="xs:string" name="name"/>
-                          <xs:element type="xs:string" name="color"/>
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:sequence>
-                </xs:complexType>
-              </xs:element>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
         <xs:element name="properties">
           <xs:complexType>
             <xs:sequence>
