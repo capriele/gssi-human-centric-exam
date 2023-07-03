@@ -64,6 +64,10 @@ python $PATH$/generateDS.py -o generated/robot.py schemas/robot.xsd
 python $PATH$/generateDS.py -o generated/patient.py schemas/patient.xsd
 ```
 
+```bash
+python $PATH$/generateDS.py -o generated/hospital.py schemas/hospital.xsd
+```
+
 # Technicalities
 The software is written in Python 3 and utilizes the following libraries:
 
