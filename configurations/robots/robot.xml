@@ -5,31 +5,6 @@
     <color>#FFA500</color>
     <description>Description 1</description>
 
-    <hospital>
-        <rooms>
-            <room>
-                <id>0</id>
-                <name>Bob Room</name>
-                <color>#0096FF</color>
-            </room>
-            <room>
-                <id>1</id>
-                <name>Alice Room</name>
-                <color>#AA336A</color>
-            </room>
-            <room>
-                <id>2</id>
-                <name>Medical Room</name>
-                <color>#FFFFFF</color>
-            </room>
-            <room>
-                <id>3</id>
-                <name>Living Room</name>
-                <color>#00FF00</color>
-            </room>
-        </rooms>
-    </hospital>
-
     <properties>
         <property key="patient_humor" from="1" to="10"></property>
         <property key="patient_humor_good" from="6" to="10"></property>
