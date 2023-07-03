@@ -29,6 +29,9 @@ The environment is fully configurable via XML files. For example you can add a n
 * Patrizio Pelliccione, <patrizio.pelliccione@gssi.it>
 
 # Installation
+For all the test we used a virtual environment with all the packages listed in requirements_*.txt. 
+Furthermore we used Python 3.10.8.
+
 For Windows:
 
 ```
@@ -87,6 +90,29 @@ PyTrees is a Python library for working with tree-based data structures. It prov
 
 The image below summarize all the tasks that the robot will daily execute in a behavioural tree implemented in PyTrees.
 ![Robot daily job](./images/daily_jobs.png)
+
+## User Interactions
+Once the software has been launched and its environment started you can interact with it using the following keyboard keys:
+ - "**s**": To start the robot daily activities
+ - "**r**": To reset the environment
+ - "**y**": To simulate patient's affermative answer to robot's question "Can I enter? (inside patient's room)"
+ - "**n**": To simulate patient's negative answer to robot's question "Can I enter? (inside patient's room)"
+
+## Actions
+We summarized all the action that a robot can accomplish in three main cathegories:
+- **MovingAction**: this class implements all the stuff needed to allow a robot movement (inside the world) from a starting point A to a destination point B
+- **ExecutionAction**: this class implements all the stuff to execute a logic process
+- **InteractionAction**: this class implements all the stuff to to allow a robot to interact with an external entity (in this case a patient)
+
+All the classes implements a callback (*onComplete*) that it is fired every times the action succesfully completes. Their source code can be found under `./planner/actions.py`.
+
+## Planner
+The *Planner* is a class able to integrate the possible robot actions inside a scenario based on the behavioural trees. In general it implements two kind of scenarios:
+- *static scenario*: it is a sequence of actions that a robot has to execute every time in the same way
+- *dynamic scenario*: it is a sequence of actions that change at run time due to external interations
+
+For the first case we simply implemented the correct sequence in the behavioural tree. For the second case, instead, we supposed that any interaction is implemented by a Brownian process that will condition the behavior of the robot.
+Its source code can be found under `./planner/planner.py`.
 
 # Enhancements
 
