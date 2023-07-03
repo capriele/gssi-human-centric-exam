@@ -32,46 +32,6 @@ class World:
                 return self.aliceRoomPolygon().contains(point)
         return False
 
-    def bobMovementPolygon(self):
-        return Polygon([
-            self.map2point(Point(95, 544)),
-            self.map2point(Point(95, 457)),
-            self.map2point(Point(289, 457)),
-            self.map2point(Point(289, 590)),
-            self.map2point(Point(71, 590)),
-            self.map2point(Point(19, 590)),
-            self.map2point(Point(19, 590)),
-            self.map2point(Point(19, 6)),
-            self.map2point(Point(289, 6)),
-            self.map2point(Point(289, 140)),
-            self.map2point(Point(95, 140)),
-            self.map2point(Point(95, 50)),
-            self.map2point(Point(80, 50)),
-            self.map2point(Point(80, 544)),
-        ])
-
-    def aliceMovementPolygon(self):
-        return Polygon([
-            self.map2point(Point(95, 410)),
-            self.map2point(Point(95, 440)),
-            self.map2point(Point(289, 440)),
-            self.map2point(Point(289, 307)),
-            self.map2point(Point(95, 309)),
-            self.map2point(Point(95, 360)),
-            self.map2point(Point(80, 360)),
-            self.map2point(Point(80, 50)),
-            self.map2point(Point(95, 50)),
-            self.map2point(Point(95, 140)),
-            self.map2point(Point(289, 140)),
-            self.map2point(Point(289, 6)),
-            self.map2point(Point(19, 6)),
-            self.map2point(Point(19, 590)),
-            self.map2point(Point(19, 590)),
-            self.map2point(Point(71, 590)),
-            self.map2point(Point(80, 544)),
-            self.map2point(Point(80, 410)),
-        ])
-
     def randomPointsInPolygon(self, polygon, start=Point(0, 0), distance=20):
         points = []
         # minx, miny, maxx, maxy = polygon.bounds

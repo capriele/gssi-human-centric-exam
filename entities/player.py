@@ -68,13 +68,6 @@ class Player(Entity):
         self.room = next(
             (x for x in self.world.rooms if self.name.lower() in x.name.lower()), None
         )
-        if self.name == "Alice":
-            self.area = self.world.aliceMovementPolygon()
-        elif self.name == "Bob":
-            self.area = self.world.bobMovementPolygon()
-        else:
-            if self.is_staff:
-                self.room = self.initialPosition
 
     def update(self):
         if self.is_human:
