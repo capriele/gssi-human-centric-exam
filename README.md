@@ -132,3 +132,17 @@ Its source code can be found under `./planner/planner.py`.
 - [Distance transform: Base](https://robotics102.github.io/lectures/rob102_07_distance_transform.pdf)
 - [Distance transform: Potential fields](https://robotics102.github.io/lectures/rob102_08_potential_field.pdf)
 - [Behavioural Tree](https://roboticseabass.com/2021/05/08/introduction-to-behavior-trees/)
+
+# Troubleshooting
+
+Probably the following libraries, graphviz and pydot, will need to be installed.
+
+Using apt
+```bash
+sudo apt-get install pydot graphviz
+```
+
+Using brew:
+```bash
+brew install pydot graphviz
+```
