@@ -139,10 +139,10 @@ Probably the following libraries, graphviz and pydot, will need to be installed.
 
 Using apt:
 ```bash
-sudo apt-get install pydot graphviz
+sudo apt-get install python3-pydot graphviz
 ```
 
 Using brew:
 ```bash
-brew install pydot graphviz
+brew install python3-pydot graphviz
 ```
