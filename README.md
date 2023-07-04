@@ -137,7 +137,7 @@ Its source code can be found under `./planner/planner.py`.
 
 Probably the following libraries, graphviz and pydot, will need to be installed.
 
-Using apt
+Using apt:
 ```bash
 sudo apt-get install pydot graphviz
 ```
